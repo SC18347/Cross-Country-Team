@@ -1,246 +1,724 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Cross Country Workouts</title>
+<title>Weekly Workouts</title>
 
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Karla:wght@400;500;600&display=swap" rel="stylesheet">
 
-        body {
-            margin: 0;
-            font-family: Arial, Helvetica, sans-serif;
-            background: #f3f3f3;
-            color: #222;
-        }
+<!-- OCR ENGINE -->
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
-        .header {
-            padding: 25px 18px 15px;
-            text-align: center;
-        }
+<style>
+:root {
+  --bg: #0A0F1D;
+  --card: #1A233D;
+  --today: #00F0FF;
+  --ink: #ffffff;
+  --pine: #00F0FF;
+  --trail: #b5501f;
+  --muted: #9aa5b5;
+  --shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  --radius: 22px;
+}
 
-        .header h1 {
-            margin: 0;
-            font-size: 30px;
-        }
+* {
+  box-sizing: border-box;
+}
 
-        .header p {
-            margin: 6px 0 0;
-            color: #666;
-            font-size: 15px;
-        }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Karla', -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
 
-        .container {
-            width: 92%;
-            max-width: 700px;
-            margin: auto;
-            padding-bottom: 40px;
-        }
+/* ===== HEADER ===== */
 
-        /* Individual day card */
-        .day-card {
-            background: white;
-            border-radius: 22px;
-            padding: 20px;
-            margin: 16px 0;
-            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
-        }
+.page-header {
+  padding: 36px 20px 8px;
+  text-align: center;
+}
 
-        .day-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+.page-header h1 {
+  margin: 0;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 600;
+  font-size: 1.7rem;
+  letter-spacing: 0.02em;
+  color: var(--pine);
+}
 
-        .day {
-            font-size: 22px;
-            font-weight: bold;
-        }
+.status {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.85rem;
+  padding: 8px 20px 4px;
+}
 
-        .date {
-            color: #777;
-            font-size: 15px;
-        }
+/* ===== DAY CARDS ===== */
 
-        .practice-time {
-            margin-top: 12px;
-            font-size: 16px;
-            font-weight: bold;
-        }
+.day-cards {
+  max-width: 460px;
+  margin: 0 auto;
+  padding: 20px 16px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
 
-        .workout {
-            margin-top: 12px;
-            line-height: 1.5;
-            font-size: 16px;
-        }
+.day-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 18px 20px;
+  border: 2px solid transparent;
+}
 
-        /* Weekly workout image */
-        .weekly-workout {
-            background: white;
-            border-radius: 22px;
-            padding: 12px;
-            margin-top: 25px;
-            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
-        }
+.day-card.is-today {
+  border-color: var(--trail);
+}
 
-        .weekly-workout img {
-            display: block;
-            width: 100%;
-            height: auto;
-            border-radius: 15px;
-        }
+.day-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
 
-        .weekly-title {
-            font-size: 21px;
-            font-weight: bold;
-            margin: 8px 8px 15px;
-        }
+.day-name-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
-        footer {
-            text-align: center;
-            padding: 25px;
-            color: #777;
-            font-size: 13px;
-        }
-    </style>
+.day-name {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: var(--pine);
+}
+
+.today-tag {
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--trail);
+  padding: 2px 9px;
+  border-radius: 999px;
+}
+
+.day-date {
+  color: var(--muted);
+  font-size: 0.95rem;
+  white-space: nowrap;
+}
+
+.practice-time {
+  margin-top: 10px;
+  font-weight: 600;
+  color: var(--pine);
+}
+
+.location {
+  margin-top: 5px;
+  color: var(--muted);
+}
+
+.workout-text {
+  margin-top: 12px;
+  line-height: 1.45;
+  font-size: 1rem;
+}
+
+/* ===== FULL WEEK IMAGE ===== */
+
+.week-bubble {
+  max-width: 460px;
+  margin: 10px auto 36px;
+  padding: 18px;
+  background: var(--card);
+  border-radius: 26px;
+  box-shadow: var(--shadow);
+}
+
+.week-bubble h2 {
+  margin: 0 0 12px;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--pine);
+  text-align: center;
+}
+
+.week-bubble img {
+  width: 100%;
+  display: block;
+  border-radius: 16px;
+}
+
+/* ===== FOOTER ===== */
+
+.site-footer {
+  text-align: center;
+  padding: 10px 20px 28px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+/* ===== LOADING ===== */
+
+.loading {
+  text-align: center;
+  padding: 25px;
+  color: var(--muted);
+}
+</style>
 </head>
 
 <body>
 
-    <div class="header">
-        <h1>Cross Country</h1>
-        <p>Weekly Workouts & Practice Information</p>
-    </div>
+<header class="page-header">
+  <h1>This Week's Workouts</h1>
+</header>
 
-    <main class="container">
+<div id="status" class="status">
+  Reading workout image...
+</div>
 
-        <!-- MONDAY -->
-        <div class="day-card">
+<main>
 
-            <div class="day-top">
-                <div class="day">Monday</div>
-                <div class="date">September 14</div>
-            </div>
+  <section
+    id="day-cards"
+    class="day-cards"
+    aria-live="polite">
+  </section>
 
+  <section class="week-bubble">
+
+    <h2>Full Week Schedule</h2>
+
+    <img
+      src="week-workout.jpg"
+      alt="Photo of this week's full workout schedule"
+      id="week-photo"
+    >
+
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <p>&copy; <span id="year"></span> SC Smith</p>
+</footer>
+
+
+<script>
+
+/* =========================================================
+   WORKOUT IMAGE
+   ========================================================= */
+
+const IMAGE_FILE = "week-workout.jpg";
+
+
+/* =========================================================
+   HELPER FUNCTIONS
+   ========================================================= */
+
+function escapeHTML(text) {
+  const div = document.createElement("div");
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+
+/*
+   Turn things like:
+
+   SEPT 9, 2026
+   September 9, 2026
+   WEDNESDAY SEPT 9, 2026
+
+   into a JavaScript Date.
+*/
+
+function findDates(text) {
+
+  const monthPattern =
+    "(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:t(?:ember)?)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)";
+
+  const regex = new RegExp(
+    "(" +
+    "(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)?" +
+    "\\s*" +
+    monthPattern +
+    "\\s+\\d{1,2}(?:,\\s*\\d{4})?" +
+    ")",
+    "gi"
+  );
+
+  const matches = [...text.matchAll(regex)];
+
+  return matches.map(match => {
+
+    let value = match[1].trim();
+
+    if (!/\d{4}/.test(value)) {
+      value += ", " + new Date().getFullYear();
+    }
+
+    const date = new Date(value);
+
+    if (isNaN(date.getTime())) {
+      return null;
+    }
+
+    return {
+      date: date,
+      original: match[0]
+    };
+
+  }).filter(Boolean);
+}
+
+
+/*
+   Find times such as:
+
+   6:00 PM
+   4:10pm
+   5:15 – 5:30 PM
+*/
+
+function findTimes(text) {
+
+  const regex =
+    /\b\d{1,2}:\d{2}\s*(?:AM|PM)?(?:\s*[–-]\s*\d{1,2}:\d{2}\s*(?:AM|PM)?)?\b/gi;
+
+  return [...text.matchAll(regex)].map(x => x[0]);
+}
+
+
+/*
+   Find location.
+*/
+
+function findLocation(text) {
+
+  const match = text.match(
+    /(?:Location|Meet Location|Place)\s*:\s*([^\n]+)/i
+  );
+
+  if (!match) {
+    return "";
+  }
+
+  return match[1]
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+
+/*
+   Find a title/event from the beginning of the announcement.
+*/
+
+function findWorkoutTitle(text) {
+
+  const lines = text
+    .split(/\n+/)
+    .map(line => line.trim())
+    .filter(line => line.length > 2);
+
+  for (let line of lines) {
+
+    line = line
+      .replace(/[•●]/g, "")
+      .trim();
+
+    /*
+       Ignore obvious metadata lines.
+    */
+
+    if (/^(location|time|schedule)\s*:/i.test(line)) {
+      continue;
+    }
+
+    if (/^(full school day|after school)/i.test(line)) {
+      continue;
+    }
+
+    /*
+       Remove date from title.
+    */
+
+    line = line.replace(
+      /\(?\s*(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)?\s*(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:t(?:ember)?)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+\d{1,2}(?:,\s*\d{4})?\s*\)?\.?/gi,
+      ""
+    ).trim();
+
+    /*
+       Clean common announcement wording.
+    */
+
+    line = line
+      .replace(/^Tomorrow is our\s+/i, "")
+      .replace(/^Today is our\s+/i, "")
+      .replace(/^This is our\s+/i, "")
+      .replace(/^Cross[- ]Country\s+Meet!?$/i, "Cross-Country Meet");
+
+    if (line.length >= 4) {
+      return line;
+    }
+  }
+
+  return "Workout / Team Event";
+}
+
+
+/*
+   Clean OCR text.
+*/
+
+function cleanText(text) {
+
+  return text
+    .replace(/\r/g, "")
+    .replace(/[ \t]+/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+
+/* =========================================================
+   BUILD CARDS
+   ========================================================= */
+
+function renderCards(workouts) {
+
+  const container =
+    document.getElementById("day-cards");
+
+  container.innerHTML = "";
+
+  if (workouts.length === 0) {
+
+    container.innerHTML = `
+      <div class="day-card">
+        <div class="workout-text">
+          No workout information could be detected.
+        </div>
+      </div>
+    `;
+
+    return;
+  }
+
+  const today = new Date();
+
+  workouts.forEach(w => {
+
+    const d = w.date;
+
+    const dayName =
+      d.toLocaleDateString("en-US", {
+        weekday: "long"
+      });
+
+    const dateLabel =
+      d.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric"
+      });
+
+    const isToday =
+      d.toDateString() === today.toDateString();
+
+    const card =
+      document.createElement("div");
+
+    card.className =
+      "day-card" +
+      (isToday ? " is-today" : "");
+
+    if (isToday) {
+      card.id = "today-card";
+    }
+
+    card.innerHTML = `
+
+      <div class="day-card-top">
+
+        <span class="day-name-wrap">
+
+          <span class="day-name">
+            ${escapeHTML(dayName)}
+          </span>
+
+          ${
+            isToday
+              ? '<span class="today-tag">Today</span>'
+              : ""
+          }
+
+        </span>
+
+        <span class="day-date">
+          ${escapeHTML(dateLabel)}
+        </span>
+
+      </div>
+
+      ${
+        w.time
+          ? `
             <div class="practice-time">
-                Practice: 4:30 PM
+              Time: ${escapeHTML(w.time)}
             </div>
+          `
+          : ""
+      }
 
-            <div class="workout">
-                Easy Run — 4 miles
-                <br>
-                Finish with 4 × 100m strides.
+      ${
+        w.location
+          ? `
+            <div class="location">
+              Location: ${escapeHTML(w.location)}
             </div>
+          `
+          : ""
+      }
+
+      <div class="workout-text">
+        ${escapeHTML(w.workout)}
+      </div>
+    `;
+
+    container.appendChild(card);
+  });
+
+  /*
+     Automatically scroll to today's card.
+  */
+
+  const todayCard =
+    document.getElementById("today-card");
+
+  if (todayCard) {
+
+    const reduceMotion =
+      window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
+
+    todayCard.scrollIntoView({
+      behavior: reduceMotion ? "auto" : "smooth",
+      block: "center"
+    });
+  }
+}
+
+
+/* =========================================================
+   OCR
+   ========================================================= */
+
+async function readWorkoutImage() {
+
+  const status =
+    document.getElementById("status");
+
+  try {
+
+    status.textContent =
+      "Reading workout image...";
+
+    /*
+       Make sure image exists.
+    */
+
+    const image =
+      document.getElementById("week-photo");
+
+    await new Promise((resolve, reject) => {
+
+      image.onload = resolve;
+
+      image.onerror = reject;
+
+    });
+
+
+    /*
+       Start OCR.
+    */
+
+    const result =
+      await Tesseract.recognize(
+        IMAGE_FILE,
+        "eng",
+        {
+          logger: message => {
+
+            if (
+              message.status === "recognizing text" &&
+              typeof message.progress === "number"
+            ) {
+
+              const percent =
+                Math.round(
+                  message.progress * 100
+                );
+
+              status.textContent =
+                "Reading workout image... " +
+                percent +
+                "%";
+            }
+
+          }
+        }
+      );
+
+
+    const rawText =
+      cleanText(result.data.text);
+
+
+    console.log(
+      "OCR TEXT:",
+      rawText
+    );
+
+
+    /*
+       Find information.
+    */
+
+    const dates =
+      findDates(rawText);
+
+    const times =
+      findTimes(rawText);
+
+    const location =
+      findLocation(rawText);
+
+    const title =
+      findWorkoutTitle(rawText);
+
+
+    /*
+       Build workout objects.
+    */
+
+    const workouts = [];
+
+
+    /*
+       If multiple dates are found,
+       create a card for each date.
+    */
+
+    if (dates.length > 0) {
+
+      dates.forEach((item, index) => {
+
+        workouts.push({
+
+          date: item.date,
+
+          time:
+            times[index] ||
+            times[0] ||
+            "",
+
+          location:
+            location,
+
+          workout:
+            title
+
+        });
+
+      });
+
+    }
+
+
+    /*
+       If no date was found, show a fallback.
+    */
+
+    if (workouts.length === 0) {
+
+      workouts.push({
+
+        date: new Date(),
+
+        time: times[0] || "",
+
+        location: location,
+
+        workout: title
+
+      });
+
+    }
+
+
+    renderCards(workouts);
+
+
+    status.textContent =
+      "Workout information updated from the image.";
+
+  }
+
+  catch (error) {
+
+    console.error(error);
+
+    status.textContent =
+      "Could not read the workout image.";
+
+    document.getElementById("day-cards").innerHTML = `
+
+      <div class="day-card">
+
+        <div class="workout-text">
+
+          Make sure the image is named
+          <strong>week-workout.jpg</strong>
+          and is in the same GitHub repository
+          as this index.html file.
 
         </div>
 
+      </div>
 
-        <!-- TUESDAY -->
-        <div class="day-card">
-
-            <div class="day-top">
-                <div class="day">Tuesday</div>
-                <div class="date">September 15</div>
-            </div>
-
-            <div class="practice-time">
-                Practice: 4:30 PM
-            </div>
-
-            <div class="workout">
-                Workout — Intervals
-                <br>
-                6 × 800m with recovery jog between repetitions.
-            </div>
-
-        </div>
+    `;
+  }
+}
 
 
-        <!-- WEDNESDAY -->
-        <div class="day-card">
+/* =========================================================
+   START
+   ========================================================= */
 
-            <div class="day-top">
-                <div class="day">Wednesday</div>
-                <div class="date">September 16</div>
-            </div>
+document.getElementById("year").textContent =
+  new Date().getFullYear();
 
-            <div class="practice-time">
-                Practice: 4:30 PM
-            </div>
+readWorkoutImage();
 
-            <div class="workout">
-                Recovery Run — 3 miles
-            </div>
-
-        </div>
-
-
-        <!-- THURSDAY -->
-        <div class="day-card">
-
-            <div class="day-top">
-                <div class="day">Thursday</div>
-                <div class="date">September 17</div>
-            </div>
-
-            <div class="practice-time">
-                Practice: 4:30 PM
-            </div>
-
-            <div class="workout">
-                Tempo Run — 20 minutes
-            </div>
-
-        </div>
-
-
-        <!-- FRIDAY -->
-        <div class="day-card">
-
-            <div class="day-top">
-                <div class="day">Friday</div>
-                <div class="date">September 18</div>
-            </div>
-
-            <div class="practice-time">
-                Practice: 4:30 PM
-            </div>
-
-            <div class="workout">
-                Easy Run — 3 miles
-            </div>
-
-        </div>
-
-
-        <!-- FULL WEEK IMAGE -->
-        <div class="weekly-workout">
-
-            <div class="weekly-title">
-                Full Week Workout
-            </div>
-
-            <!--
-                Replace "weekly-workout.jpg"
-                with the name of your uploaded image.
-            -->
-            <img
-                src="weekly-workout.jpg"
-                alt="Cross country weekly workout"
-            >
-
-        </div>
-
-    </main>
-
-
-    <footer>
-        © SC Smith
-    </footer>
+</script>
 
 </body>
 </html>
