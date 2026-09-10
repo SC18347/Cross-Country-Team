@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Cross Country Workouts</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f3f3f3;
+            color: #222;
+        }
+
+        .header {
+            padding: 25px 18px 15px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 30px;
+        }
+
+        .header p {
+            margin: 6px 0 0;
+            color: #666;
+            font-size: 15px;
+        }
+
+        .container {
+            width: 92%;
+            max-width: 700px;
+            margin: auto;
+            padding-bottom: 40px;
+        }
+
+        /* Individual day card */
+        .day-card {
+            background: white;
+            border-radius: 22px;
+            padding: 20px;
+            margin: 16px 0;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .day-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .day {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .date {
+            color: #777;
+            font-size: 15px;
+        }
+
+        .practice-time {
+            margin-top: 12px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .workout {
+            margin-top: 12px;
+            line-height: 1.5;
+            font-size: 16px;
+        }
+
+        /* Weekly workout image */
+        .weekly-workout {
+            background: white;
+            border-radius: 22px;
+            padding: 12px;
+            margin-top: 25px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .weekly-workout img {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: 15px;
+        }
+
+        .weekly-title {
+            font-size: 21px;
+            font-weight: bold;
+            margin: 8px 8px 15px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #777;
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>Cross Country</h1>
+        <p>Weekly Workouts & Practice Information</p>
+    </div>
+
+    <main class="container">
+
+        <!-- MONDAY -->
+        <div class="day-card">
+
+            <div class="day-top">
+                <div class="day">Monday</div>
+                <div class="date">September 14</div>
+            </div>
+
+            <div class="practice-time">
+                Practice: 4:30 PM
+            </div>
+
+            <div class="workout">
+                Easy Run — 4 miles
+                <br>
+                Finish with 4 × 100m strides.
+            </div>
+
+        </div>
+
+
+        <!-- TUESDAY -->
+        <div class="day-card">
+
+            <div class="day-top">
+                <div class="day">Tuesday</div>
+                <div class="date">September 15</div>
+            </div>
+
+            <div class="practice-time">
+                Practice: 4:30 PM
+            </div>
+
+            <div class="workout">
+                Workout — Intervals
+                <br>
+                6 × 800m with recovery jog between repetitions.
+            </div>
+
+        </div>
+
+
+        <!-- WEDNESDAY -->
+        <div class="day-card">
+
+            <div class="day-top">
+                <div class="day">Wednesday</div>
+                <div class="date">September 16</div>
+            </div>
+
+            <div class="practice-time">
+                Practice: 4:30 PM
+            </div>
+
+            <div class="workout">
+                Recovery Run — 3 miles
+            </div>
+
+        </div>
+
+
+        <!-- THURSDAY -->
+        <div class="day-card">
+
+            <div class="day-top">
+                <div class="day">Thursday</div>
+                <div class="date">September 17</div>
+            </div>
+
+            <div class="practice-time">
+                Practice: 4:30 PM
+            </div>
+
+            <div class="workout">
+                Tempo Run — 20 minutes
+            </div>
+
+        </div>
+
+
+        <!-- FRIDAY -->
+        <div class="day-card">
+
+            <div class="day-top">
+                <div class="day">Friday</div>
+                <div class="date">September 18</div>
+            </div>
+
+            <div class="practice-time">
+                Practice: 4:30 PM
+            </div>
+
+            <div class="workout">
+                Easy Run — 3 miles
+            </div>
+
+        </div>
+
+
+        <!-- FULL WEEK IMAGE -->
+        <div class="weekly-workout">
+
+            <div class="weekly-title">
+                Full Week Workout
+            </div>
+
+            <!--
+                Replace "weekly-workout.jpg"
+                with the name of your uploaded image.
+            -->
+            <img
+                src="weekly-workout.jpg"
+                alt="Cross country weekly workout"
+            >
+
+        </div>
+
+    </main>
+
+
+    <footer>
+        © SC Smith
+    </footer>
+
+</body>
+</html>
