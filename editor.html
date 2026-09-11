@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workout Editor</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #060a10;
+  --grid-line: rgba(61, 220, 255, 0.05);
+  --panel: #0c141d;
+  --panel-border: rgba(61, 220, 255, 0.28);
+  --cyan: #3ddcff;
+  --cyan-soft: rgba(61, 220, 255, 0.15);
+  --amber: #ffb454;
+  --text: #d7eef5;
+  --muted: #6f93a3;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 34px 34px;
+  color: var(--text);
+  font-family: 'Rajdhani', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+.page-header { text-align: center; padding: 40px 20px 10px; }
+.status-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.72rem; letter-spacing: 0.12em;
+  color: var(--amber);
+  border: 1px solid var(--panel-border);
+  padding: 5px 14px; border-radius: 999px;
+  background: rgba(255, 180, 84, 0.1);
+}
+.status-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--amber); box-shadow: 0 0 8px var(--amber);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+@media (prefers-reduced-motion: reduce) { .status-dot { animation: none; } }
+.page-header h1 {
+  margin: 16px 0 6px;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700; font-size: 1.4rem; letter-spacing: 0.05em;
+  text-shadow: 0 0 18px var(--cyan-soft);
+}
+.editor-wrap { max-width: 480px; margin: 0 auto; padding: 10px 16px 60px; }
+.hint { font-size: 0.92rem; color: var(--muted); line-height: 1.5; margin-bottom: 20px; }
+.hint code { background: var(--panel); padding: 1px 5px; border-radius: 4px; color: var(--cyan); }
+.day-row {
+  background: var(--panel); border: 1px solid var(--panel-border);
+  border-radius: 12px; padding: 14px 16px; margin-bottom: 14px;
+}
+.day-row label {
+  display: block; font-family: 'Share Tech Mono', monospace;
+  font-size: 0.68rem; letter-spacing: 0.08em; color: var(--muted);
+  margin: 10px 0 4px;
+}
+.day-row label:first-child { margin-top: 0; }
+.day-row input, .day-row textarea {
+  width: 100%; background: #050a0f;
+  border: 1px solid var(--panel-border); border-radius: 8px;
+  color: var(--text); font-family: 'Rajdhani', sans-serif;
+  font-size: 1rem; padding: 9px 10px;
+}
+.day-row textarea { resize: vertical; min-height: 56px; }
+button {
+  width: 100%; padding: 14px; border: none; border-radius: 10px;
+  font-family: 'Orbitron', sans-serif; font-weight: 600;
+  letter-spacing: 0.04em; font-size: 0.95rem; cursor: pointer;
+}
+#generate-btn { background: var(--cyan); color: #04121a; margin-top: 4px; }
+#copy-btn { background: var(--amber); color: #221200; margin-top: 12px; display: none; }
+.output-box {
+  margin-top: 16px; background: #050a0f;
+  border: 1px solid var(--panel-border); border-radius: 10px; padding: 14px;
+  font-family: 'Share Tech Mono', monospace; font-size: 0.78rem; color: var(--cyan);
+  white-space: pre-wrap; word-break: break-word; display: none;
+}
+</style>
+</head>
+<body>
+
+  <header class="page-header">
+    <div class="status-tag"><span class="status-dot"></span>EDITOR MODE</div>
+    <h1>WORKOUT ENTRY</h1>
+  </header>
+
+  <div class="editor-wrap">
+    <p class="hint">
+      Fill in each day below, tap <strong>Generate Code</strong>, then copy the
+      result and paste it into <code>index.html</code> — swap out everything
+      between <code>const workouts = [</code> and the matching <code>];</code>.
+    </p>
+
+    <div id="day-rows"></div>
+
+    <button id="generate-btn">Generate Code</button>
+    <div class="output-box" id="output-box"></div>
+    <button id="copy-btn">Copy to Clipboard</button>
+  </div>
+
+<script>
+  function toLocalISODate(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  }
+
+  const rowsContainer = document.getElementById("day-rows");
+  const today = new Date();
+
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(today);
+    d.setDate(d.getDate() + i);
+
+    const row = document.createElement("div");
+    row.className = "day-row";
+    row.innerHTML = `
+      <label>Date</label>
+      <input type="date" class="f-date" value="${toLocalISODate(d)}">
+      <label>Practice Time</label>
+      <input type="text" class="f-time" placeholder="3:30 PM">
+      <label>Workout (leave blank for a rest day)</label>
+      <textarea class="f-workout"></textarea>
+    `;
+    rowsContainer.appendChild(row);
+  }
+
+  document.getElementById("generate-btn").addEventListener("click", () => {
+    const rows = document.querySelectorAll(".day-row");
+    let code = "const workouts = [\n";
+    rows.forEach(row => {
+      const date = row.querySelector(".f-date").value;
+      const time = row.querySelector(".f-time").value.trim() || "—";
+      const workout = row.querySelector(".f-workout").value.trim().replace(/"/g, '\\"');
+      code += `  { date: "${date}", time: "${time}", workout: "${workout}" },\n`;
+    });
+    code += "];";
+
+    const output = document.getElementById("output-box");
+    output.textContent = code;
+    output.style.display = "block";
+    document.getElementById("copy-btn").style.display = "block";
+  });
+
+  document.getElementById("copy-btn").addEventListener("click", () => {
+    const text = document.getElementById("output-box").textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById("copy-btn");
+      const original = btn.textContent;
+      btn.textContent = "Copied!";
+      setTimeout(() => { btn.textContent = original; }, 1500);
+    });
+  });
+</script>
+</body>
+</html>
