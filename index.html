@@ -3,722 +3,219 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Weekly Workouts</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Karla:wght@400;500;600&display=swap" rel="stylesheet">
-
-<!-- OCR ENGINE -->
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
 <style>
 :root {
-  --bg: #0A0F1D;
-  --card: #1A233D;
-  --today: #00F0FF;
-  --ink: #ffffff;
-  --pine: #00F0FF;
-  --trail: #b5501f;
-  --muted: #9aa5b5;
-  --shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
-  --radius: 22px;
+  --bg: #060a10;
+  --grid-line: rgba(61, 220, 255, 0.05);
+  --panel: #0c141d;
+  --panel-border: rgba(61, 220, 255, 0.28);
+  --cyan: #3ddcff;
+  --cyan-soft: rgba(61, 220, 255, 0.15);
+  --amber: #ffb454;
+  --amber-soft: rgba(255, 180, 84, 0.12);
+  --text: #d7eef5;
+  --muted: #6f93a3;
+  --radius: 14px;
 }
-
-* {
-  box-sizing: border-box;
-}
-
+* { box-sizing: border-box; }
 body {
   margin: 0;
-  background: var(--bg);
-  color: var(--ink);
-  font-family: 'Karla', -apple-system, sans-serif;
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 34px 34px;
+  color: var(--text);
+  font-family: 'Rajdhani', sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
 /* ===== HEADER ===== */
-
-.page-header {
-  padding: 36px 20px 8px;
-  text-align: center;
+.page-header { text-align: center; padding: 44px 20px 20px; }
+.status-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.72rem; letter-spacing: 0.12em;
+  color: var(--cyan);
+  border: 1px solid var(--panel-border);
+  padding: 5px 14px; border-radius: 999px;
+  background: var(--cyan-soft);
 }
-
+.status-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--cyan); box-shadow: 0 0 8px var(--cyan);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+@media (prefers-reduced-motion: reduce) { .status-dot { animation: none; } }
 .page-header h1 {
-  margin: 0;
-  font-family: 'Oswald', sans-serif;
-  font-weight: 600;
-  font-size: 1.7rem;
-  letter-spacing: 0.02em;
-  color: var(--pine);
+  margin: 16px 0 6px;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700; font-size: 1.5rem; letter-spacing: 0.05em;
+  color: var(--text);
+  text-shadow: 0 0 18px var(--cyan-soft);
 }
-
-.status {
-  text-align: center;
-  color: var(--muted);
-  font-size: 0.85rem;
-  padding: 8px 20px 4px;
+.hud-sub {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem; color: var(--muted); letter-spacing: 0.06em;
 }
 
 /* ===== DAY CARDS ===== */
-
 .day-cards {
-  max-width: 460px;
-  margin: 0 auto;
-  padding: 20px 16px 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+  max-width: 460px; margin: 0 auto; padding: 24px 16px 8px;
+  display: flex; flex-direction: column; gap: 16px;
 }
-
 .day-card {
-  background: var(--card);
+  position: relative;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
   border-radius: var(--radius);
-  box-shadow: var(--shadow);
   padding: 18px 20px;
-  border: 2px solid transparent;
 }
-
+.day-card::before, .day-card::after {
+  content: ""; position: absolute; width: 14px; height: 14px;
+  border: 2px solid var(--cyan); opacity: 0.55;
+}
+.day-card::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+.day-card::after { bottom: -1px; right: -1px; border-left: none; border-top: none; }
 .day-card.is-today {
-  border-color: var(--trail);
+  border-color: var(--amber);
+  background: linear-gradient(var(--amber-soft), var(--amber-soft)), var(--panel);
+  box-shadow: 0 0 24px rgba(255, 180, 84, 0.18);
 }
-
-.day-card-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-}
-
-.day-name-wrap {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
+.day-card.is-today::before, .day-card.is-today::after { border-color: var(--amber); opacity: 0.9; }
+.day-card-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.day-name-wrap { display: flex; align-items: center; gap: 8px; }
 .day-name {
-  font-family: 'Oswald', sans-serif;
-  font-weight: 600;
-  font-size: 1.2rem;
-  color: var(--pine);
+  font-family: 'Orbitron', sans-serif; font-weight: 600;
+  font-size: 1rem; letter-spacing: 0.03em; color: var(--cyan);
 }
-
+.day-card.is-today .day-name { color: var(--amber); }
 .today-tag {
-  font-family: 'Oswald', sans-serif;
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: #fff;
-  background: var(--trail);
-  padding: 2px 9px;
-  border-radius: 999px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem; letter-spacing: 0.08em;
+  color: #0a0e14; background: var(--amber);
+  padding: 2px 8px; border-radius: 4px;
 }
-
-.day-date {
-  color: var(--muted);
-  font-size: 0.95rem;
-  white-space: nowrap;
-}
-
+.day-date { font-family: 'Share Tech Mono', monospace; color: var(--muted); font-size: 0.82rem; }
 .practice-time {
-  margin-top: 10px;
-  font-weight: 600;
-  color: var(--pine);
+  margin-top: 10px; font-family: 'Share Tech Mono', monospace;
+  font-size: 0.88rem; color: var(--cyan);
 }
+.day-card.is-today .practice-time { color: var(--amber); }
+.workout-text { margin-top: 8px; line-height: 1.45; white-space: pre-line; font-size: 1.02rem; }
 
-.location {
-  margin-top: 5px;
-  color: var(--muted);
-}
-
-.workout-text {
-  margin-top: 12px;
-  line-height: 1.45;
-  font-size: 1rem;
-}
-
-/* ===== FULL WEEK IMAGE ===== */
-
+/* ===== FULL WEEK BUBBLE ===== */
 .week-bubble {
-  max-width: 460px;
-  margin: 10px auto 36px;
-  padding: 18px;
-  background: var(--card);
-  border-radius: 26px;
-  box-shadow: var(--shadow);
+  position: relative; max-width: 460px; margin: 12px auto 20px; padding: 20px;
+  background: var(--panel); border: 1px solid var(--panel-border); border-radius: 18px;
 }
-
+.week-bubble::before, .week-bubble::after {
+  content: ""; position: absolute; width: 18px; height: 18px;
+  border: 2px solid var(--cyan); opacity: 0.55;
+}
+.week-bubble::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+.week-bubble::after { bottom: -1px; right: -1px; border-left: none; border-top: none; }
 .week-bubble h2 {
-  margin: 0 0 12px;
-  font-family: 'Oswald', sans-serif;
-  font-weight: 600;
-  font-size: 1.05rem;
-  color: var(--pine);
-  text-align: center;
+  margin: 0 0 14px; text-align: center;
+  font-family: 'Orbitron', sans-serif; font-weight: 600;
+  font-size: 0.9rem; letter-spacing: 0.06em; color: var(--cyan);
 }
-
-.week-bubble img {
-  width: 100%;
-  display: block;
-  border-radius: 16px;
-}
+.week-bubble img { width: 100%; display: block; border-radius: 10px; }
 
 /* ===== FOOTER ===== */
-
 .site-footer {
-  text-align: center;
-  padding: 10px 20px 28px;
-  color: var(--muted);
-  font-size: 0.85rem;
+  text-align: center; padding: 18px 20px 34px;
+  color: var(--muted); font-family: 'Share Tech Mono', monospace; font-size: 0.75rem;
 }
-
-/* ===== LOADING ===== */
-
-.loading {
-  text-align: center;
-  padding: 25px;
-  color: var(--muted);
-}
+.site-footer a { color: var(--muted); text-decoration: none; opacity: 0.6; }
+.site-footer a:hover { opacity: 1; color: var(--cyan); }
 </style>
 </head>
-
 <body>
 
-<header class="page-header">
-  <h1>This Week's Workouts</h1>
-</header>
+  <header class="page-header">
+    <div class="status-tag"><span class="status-dot"></span>SYSTEM ONLINE</div>
+    <h1>WEEKLY WORKOUTS</h1>
+    <div class="hud-sub" id="hud-date"></div>
+  </header>
 
-<div id="status" class="status">
-  Reading workout image...
-</div>
+  <main>
+    <section id="day-cards" class="day-cards" aria-live="polite"></section>
 
-<main>
+    <section class="week-bubble">
+      <h2>FULL WEEK SCHEDULE</h2>
+      <img src="week-workout.jpg" alt="Photo of this week's full workout schedule" id="week-photo">
+    </section>
+  </main>
 
-  <section
-    id="day-cards"
-    class="day-cards"
-    aria-live="polite">
-  </section>
-
-  <section class="week-bubble">
-
-    <h2>Full Week Schedule</h2>
-
-    <img
-      src="week-workout.jpg"
-      alt="Photo of this week's full workout schedule"
-      id="week-photo"
-    >
-
-  </section>
-
-</main>
-
-<footer class="site-footer">
-  <p>&copy; <span id="year"></span> SC Smith</p>
-</footer>
-
+  <footer class="site-footer">
+    <p>&copy; <span id="year"></span> SC Smith · <a href="editor.html">edit</a></p>
+  </footer>
 
 <script>
+/* =========================================
+   EDIT THIS EVERY WEEK
+   Don't want to type this by hand? Open
+   editor.html, fill in the form, and paste
+   the code it generates right here instead.
+   ========================================= */
+const workouts = [
+  { date: "2026-09-14", time: "3:30 PM", workout: "Easy 4 miles + strides" },
+  { date: "2026-09-15", time: "3:30 PM", workout: "6 x 800m @ 5k pace, 2 min rest" },
+  { date: "2026-09-16", time: "3:30 PM", workout: "Recovery run, 3 miles" },
+  { date: "2026-09-17", time: "3:30 PM", workout: "Hill repeats x 8" },
+  { date: "2026-09-18", time: "3:30 PM", workout: "Shakeout + strides" },
+  { date: "2026-09-19", time: "9:00 AM", workout: "Race day" },
+  { date: "2026-09-20", time: "—",       workout: "" },
+];
 
-/* =========================================================
-   WORKOUT IMAGE
-   ========================================================= */
-
-const IMAGE_FILE = "week-workout.jpg";
-
-
-/* =========================================================
-   HELPER FUNCTIONS
-   ========================================================= */
-
-function escapeHTML(text) {
-  const div = document.createElement("div");
-  div.textContent = text;
-  return div.innerHTML;
-}
-
-
-/*
-   Turn things like:
-
-   SEPT 9, 2026
-   September 9, 2026
-   WEDNESDAY SEPT 9, 2026
-
-   into a JavaScript Date.
-*/
-
-function findDates(text) {
-
-  const monthPattern =
-    "(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:t(?:ember)?)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)";
-
-  const regex = new RegExp(
-    "(" +
-    "(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)?" +
-    "\\s*" +
-    monthPattern +
-    "\\s+\\d{1,2}(?:,\\s*\\d{4})?" +
-    ")",
-    "gi"
-  );
-
-  const matches = [...text.matchAll(regex)];
-
-  return matches.map(match => {
-
-    let value = match[1].trim();
-
-    if (!/\d{4}/.test(value)) {
-      value += ", " + new Date().getFullYear();
-    }
-
-    const date = new Date(value);
-
-    if (isNaN(date.getTime())) {
-      return null;
-    }
-
-    return {
-      date: date,
-      original: match[0]
-    };
-
-  }).filter(Boolean);
-}
-
-
-/*
-   Find times such as:
-
-   6:00 PM
-   4:10pm
-   5:15 – 5:30 PM
-*/
-
-function findTimes(text) {
-
-  const regex =
-    /\b\d{1,2}:\d{2}\s*(?:AM|PM)?(?:\s*[–-]\s*\d{1,2}:\d{2}\s*(?:AM|PM)?)?\b/gi;
-
-  return [...text.matchAll(regex)].map(x => x[0]);
-}
-
-
-/*
-   Find location.
-*/
-
-function findLocation(text) {
-
-  const match = text.match(
-    /(?:Location|Meet Location|Place)\s*:\s*([^\n]+)/i
-  );
-
-  if (!match) {
-    return "";
-  }
-
-  return match[1]
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-
-/*
-   Find a title/event from the beginning of the announcement.
-*/
-
-function findWorkoutTitle(text) {
-
-  const lines = text
-    .split(/\n+/)
-    .map(line => line.trim())
-    .filter(line => line.length > 2);
-
-  for (let line of lines) {
-
-    line = line
-      .replace(/[•●]/g, "")
-      .trim();
-
-    /*
-       Ignore obvious metadata lines.
-    */
-
-    if (/^(location|time|schedule)\s*:/i.test(line)) {
-      continue;
-    }
-
-    if (/^(full school day|after school)/i.test(line)) {
-      continue;
-    }
-
-    /*
-       Remove date from title.
-    */
-
-    line = line.replace(
-      /\(?\s*(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)?\s*(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:t(?:ember)?)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+\d{1,2}(?:,\s*\d{4})?\s*\)?\.?/gi,
-      ""
-    ).trim();
-
-    /*
-       Clean common announcement wording.
-    */
-
-    line = line
-      .replace(/^Tomorrow is our\s+/i, "")
-      .replace(/^Today is our\s+/i, "")
-      .replace(/^This is our\s+/i, "")
-      .replace(/^Cross[- ]Country\s+Meet!?$/i, "Cross-Country Meet");
-
-    if (line.length >= 4) {
-      return line;
-    }
-  }
-
-  return "Workout / Team Event";
-}
-
-
-/*
-   Clean OCR text.
-*/
-
-function cleanText(text) {
-
-  return text
-    .replace(/\r/g, "")
-    .replace(/[ \t]+/g, " ")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim();
-}
-
-
-/* =========================================================
-   BUILD CARDS
-   ========================================================= */
-
-function renderCards(workouts) {
-
-  const container =
-    document.getElementById("day-cards");
-
+function renderCards() {
+  const container = document.getElementById("day-cards");
   container.innerHTML = "";
-
-  if (workouts.length === 0) {
-
-    container.innerHTML = `
-      <div class="day-card">
-        <div class="workout-text">
-          No workout information could be detected.
-        </div>
-      </div>
-    `;
-
-    return;
-  }
-
   const today = new Date();
 
   workouts.forEach(w => {
+    const d = new Date(w.date + "T00:00:00");
+    const dayName = d.toLocaleDateString("en-US", { weekday: "long" });
+    const dateLabel = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    const isToday = d.toDateString() === today.toDateString();
 
-    const d = w.date;
-
-    const dayName =
-      d.toLocaleDateString("en-US", {
-        weekday: "long"
-      });
-
-    const dateLabel =
-      d.toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric"
-      });
-
-    const isToday =
-      d.toDateString() === today.toDateString();
-
-    const card =
-      document.createElement("div");
-
-    card.className =
-      "day-card" +
-      (isToday ? " is-today" : "");
-
-    if (isToday) {
-      card.id = "today-card";
-    }
+    const card = document.createElement("div");
+    card.className = "day-card" + (isToday ? " is-today" : "");
+    if (isToday) card.id = "today-card";
 
     card.innerHTML = `
-
       <div class="day-card-top">
-
         <span class="day-name-wrap">
-
-          <span class="day-name">
-            ${escapeHTML(dayName)}
-          </span>
-
-          ${
-            isToday
-              ? '<span class="today-tag">Today</span>'
-              : ""
-          }
-
+          <span class="day-name">${dayName}</span>
+          ${isToday ? '<span class="today-tag">TODAY</span>' : ""}
         </span>
-
-        <span class="day-date">
-          ${escapeHTML(dateLabel)}
-        </span>
-
+        <span class="day-date">${dateLabel}</span>
       </div>
-
-      ${
-        w.time
-          ? `
-            <div class="practice-time">
-              Time: ${escapeHTML(w.time)}
-            </div>
-          `
-          : ""
-      }
-
-      ${
-        w.location
-          ? `
-            <div class="location">
-              Location: ${escapeHTML(w.location)}
-            </div>
-          `
-          : ""
-      }
-
-      <div class="workout-text">
-        ${escapeHTML(w.workout)}
-      </div>
+      <div class="practice-time">PRACTICE: ${w.time}</div>
+      <div class="workout-text">${w.workout || "Rest day"}</div>
     `;
-
     container.appendChild(card);
   });
 
-  /*
-     Automatically scroll to today's card.
-  */
-
-  const todayCard =
-    document.getElementById("today-card");
-
+  const todayCard = document.getElementById("today-card");
   if (todayCard) {
-
-    const reduceMotion =
-      window.matchMedia(
-        "(prefers-reduced-motion: reduce)"
-      ).matches;
-
-    todayCard.scrollIntoView({
-      behavior: reduceMotion ? "auto" : "smooth",
-      block: "center"
-    });
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    todayCard.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
   }
 }
-
-
-/* =========================================================
-   OCR
-   ========================================================= */
-
-async function readWorkoutImage() {
-
-  const status =
-    document.getElementById("status");
-
-  try {
-
-    status.textContent =
-      "Reading workout image...";
-
-    /*
-       Make sure image exists.
-    */
-
-    const image =
-      document.getElementById("week-photo");
-
-    await new Promise((resolve, reject) => {
-
-      image.onload = resolve;
-
-      image.onerror = reject;
-
-    });
-
-
-    /*
-       Start OCR.
-    */
-
-    const result =
-      await Tesseract.recognize(
-        IMAGE_FILE,
-        "eng",
-        {
-          logger: message => {
-
-            if (
-              message.status === "recognizing text" &&
-              typeof message.progress === "number"
-            ) {
-
-              const percent =
-                Math.round(
-                  message.progress * 100
-                );
-
-              status.textContent =
-                "Reading workout image... " +
-                percent +
-                "%";
-            }
-
-          }
-        }
-      );
-
-
-    const rawText =
-      cleanText(result.data.text);
-
-
-    console.log(
-      "OCR TEXT:",
-      rawText
-    );
-
-
-    /*
-       Find information.
-    */
-
-    const dates =
-      findDates(rawText);
-
-    const times =
-      findTimes(rawText);
-
-    const location =
-      findLocation(rawText);
-
-    const title =
-      findWorkoutTitle(rawText);
-
-
-    /*
-       Build workout objects.
-    */
-
-    const workouts = [];
-
-
-    /*
-       If multiple dates are found,
-       create a card for each date.
-    */
-
-    if (dates.length > 0) {
-
-      dates.forEach((item, index) => {
-
-        workouts.push({
-
-          date: item.date,
-
-          time:
-            times[index] ||
-            times[0] ||
-            "",
-
-          location:
-            location,
-
-          workout:
-            title
-
-        });
-
-      });
-
-    }
-
-
-    /*
-       If no date was found, show a fallback.
-    */
-
-    if (workouts.length === 0) {
-
-      workouts.push({
-
-        date: new Date(),
-
-        time: times[0] || "",
-
-        location: location,
-
-        workout: title
-
-      });
-
-    }
-
-
-    renderCards(workouts);
-
-
-    status.textContent =
-      "Workout information updated from the image.";
-
-  }
-
-  catch (error) {
-
-    console.error(error);
-
-    status.textContent =
-      "Could not read the workout image.";
-
-    document.getElementById("day-cards").innerHTML = `
-
-      <div class="day-card">
-
-        <div class="workout-text">
-
-          Make sure the image is named
-          <strong>week-workout.jpg</strong>
-          and is in the same GitHub repository
-          as this index.html file.
-
-        </div>
-
-      </div>
-
-    `;
-  }
-}
-
-
-/* =========================================================
-   START
-   ========================================================= */
-
-document.getElementById("year").textContent =
-  new Date().getFullYear();
-
-readWorkoutImage();
-
+renderCards();
+
+document.getElementById("year").textContent = new Date().getFullYear();
+document.getElementById("hud-date").textContent =
+  "TRACKING — " + new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }).toUpperCase();
 </script>
-
 </body>
 </html>
