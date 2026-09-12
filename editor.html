@@ -315,6 +315,8 @@ function checkPin() {
 
 /* =========================================
    DEFAULT DAY ROWS
+   Weekdays only — starts today and rolls
+   forward, skipping any Saturday/Sunday.
    ========================================= */
 function toLocalISODate(d) {
   const y = d.getFullYear();
@@ -337,24 +339,43 @@ function createDayRow(dateVal, timeVal) {
   return row;
 }
 
+function nextWeekdays(count, startDate) {
+  const result = [];
+  const d = new Date(startDate);
+  while (result.length < count) {
+    const dow = d.getDay(); // 0 = Sunday ... 6 = Saturday
+    if (dow !== 0 && dow !== 6) result.push(new Date(d));
+    d.setDate(d.getDate() + 1);
+  }
+  return result;
+}
+
 const rowsContainer = document.getElementById("day-rows");
 const today = new Date();
-for (let i = 0; i < 7; i++) {
-  const d = new Date(today);
-  d.setDate(d.getDate() + i);
+nextWeekdays(5, today).forEach(d => {
   rowsContainer.appendChild(createDayRow(toLocalISODate(d), ""));
-}
+});
+
 
 /* =========================================
    PASTE & PARSE
    Pulls out "Mon, 6:30 / Aug / 24"-style day
-   headers reliably. Workout paragraphs get
-   left in a pile below for you to route to
-   the right day with one tap each — coach
-   pastes are too inconsistent to guess that
-   part automatically without risking a mixup.
+   headers. Weekends are recognized but
+   skipped — no Sat/Sun rows get created.
+   Workout paragraphs still land in a pile
+   below for you to route to the right day —
+   coach pastes are too inconsistent to guess
+   that part automatically without risking a
+   mismatch.
    ========================================= */
-const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const MONTHS = [
+  { abbr: "Jan", full: "january" },  { abbr: "Feb", full: "february" },
+  { abbr: "Mar", full: "march" },    { abbr: "Apr", full: "april" },
+  { abbr: "May", full: "may" },      { abbr: "Jun", full: "june" },
+  { abbr: "Jul", full: "july" },     { abbr: "Aug", full: "august" },
+  { abbr: "Sep", full: "september" },{ abbr: "Oct", full: "october" },
+  { abbr: "Nov", full: "november" }, { abbr: "Dec", full: "december" }
+];
 const DAY_LINE = /^(Sun|Mon|Tue|Wed|Thu|Fri|Sat)[a-z]*\.?,?\s*(.*)$/i;
 
 function escapeHtml(str) {
@@ -363,8 +384,36 @@ function escapeHtml(str) {
   return d.innerHTML;
 }
 
+// Cleans up copy-paste artifacts (Windows line endings, the invisible
+// non-breaking spaces web pages often use, doubled-up spaces).
+function normalizeText(text) {
+  return text
+    .replace(/\r\n/g, "\n")
+    .replace(/[\u00A0\u2007\u202F]/g, " ")
+    .replace(/[ \t]+/g, " ");
+}
+
+// Finds a month in a line. Tries an exact match first; if that fails,
+// matches just the first two letters of a word — but only when exactly
+// one month fits, so a typo like "Aug" -> "AuD" still resolves without
+// risking a wrong guess on unrelated text.
+function findMonth(line) {
+  const lower = line.toLowerCase();
+  for (const m of MONTHS) {
+    if (lower.includes(m.abbr.toLowerCase()) || lower.includes(m.full)) return m.abbr;
+  }
+  const words = lower.match(/[a-z]+/g) || [];
+  for (const w of words) {
+    if (w.length < 2) continue;
+    const prefix = w.slice(0, 2);
+    const candidates = MONTHS.filter(m => m.abbr.toLowerCase().startsWith(prefix));
+    if (candidates.length === 1) return candidates[0].abbr;
+  }
+  return "";
+}
+
 function guessYear(monthAbbr, dayNum) {
-  const monthIndex = MONTHS.indexOf(monthAbbr);
+  const monthIndex = MONTHS.findIndex(m => m.abbr === monthAbbr);
   const now = new Date();
   if (monthIndex === -1 || !dayNum) return now.getFullYear();
   let year = now.getFullYear();
@@ -376,7 +425,7 @@ function guessYear(monthAbbr, dayNum) {
 }
 
 function parseHeader(rawText) {
-  const lines = rawText.split("\n").map(l => l.trim()).filter(l => l.length > 0);
+  const lines = normalizeText(rawText).split("\n").map(l => l.trim()).filter(l => l.length > 0);
   const found = [];
   let lastAmPm = "AM";
   let lastMonth = "";
@@ -388,7 +437,7 @@ function parseHeader(rawText) {
     let rest = m[2];
     let time = "", month = "", dayNum = "";
 
-    const monthInline = MONTHS.find(mo => rest.includes(mo));
+    const monthInline = findMonth(rest);
     if (monthInline) {
       month = monthInline;
       const numMatch = rest.match(/(\d{1,2})/);
@@ -401,11 +450,11 @@ function parseHeader(rawText) {
     let j = i + 1, steps = 0;
     while (j < lines.length && steps < 3 && !DAY_LINE.test(lines[j]) && (needMonth || needDayNum || needAmPm)) {
       const line = lines[j];
-      const mo = MONTHS.find(m2 => line.includes(m2));
+      const mo = findMonth(line);
       if (mo && !month) { month = mo; needMonth = false; }
       const ampm = line.match(/AM|PM/i);
       if (ampm) { time = (time ? time + " " : "") + ampm[0].toUpperCase(); needAmPm = false; }
-      const numOnly = line.match(/^(\d{1,2})$/);
+      const numOnly = line.match(/^(\d{1,2})(st|nd|rd|th)?\.?$/i);
       if (numOnly && !dayNum) { dayNum = numOnly[1]; needDayNum = false; }
       j++; steps++;
     }
@@ -416,7 +465,10 @@ function parseHeader(rawText) {
     const resolvedMonth = month || lastMonth;
     if (resolvedMonth) lastMonth = resolvedMonth;
 
-    found.push({ dayAbbr, time: time.trim(), month: resolvedMonth, dayNum });
+    if (!/^(Sat|Sun)$/i.test(dayAbbr)) {
+      found.push({ dayAbbr, time: time.trim(), month: resolvedMonth, dayNum });
+    }
+
     i = j;
   }
 
@@ -426,7 +478,7 @@ function parseHeader(rawText) {
 function rebuildDayRows(headerRows) {
   rowsContainer.innerHTML = "";
   headerRows.forEach(h => {
-    const monthIndex = MONTHS.indexOf(h.month);
+    const monthIndex = MONTHS.findIndex(m => m.abbr === h.month);
     const year = guessYear(h.month, h.dayNum);
     const iso = (monthIndex >= 0 && h.dayNum)
       ? `${year}-${String(monthIndex + 1).padStart(2, "0")}-${String(h.dayNum).padStart(2, "0")}`
@@ -483,13 +535,14 @@ document.getElementById("parse-btn").addEventListener("click", () => {
   const { headerRows, leftoverLines } = parseHeader(raw);
 
   if (headerRows.length === 0) {
-    alert('Couldn\'t find day patterns like "Mon, 6:30" in that text — fill the days in below by hand instead.');
+    alert('Couldn\'t find weekday patterns like "Mon, 6:30" in that text — fill the days in below by hand instead.');
     return;
   }
 
   rebuildDayRows(headerRows);
   renderLeftovers(leftoverLines);
 });
+
 
 /* =========================================
    GENERATE CODE
