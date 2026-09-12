@@ -209,6 +209,9 @@ button {
 
     <div id="editor-content">
 
+#publish-btn { background: var(--cyan); color: #04121a; margin-top: 10px; display: none; }
+
+
       <div class="panel-block">
         <label>Paste your coach's schedule text</label>
         <textarea id="raw-paste" rows="8" placeholder="Paste everything here, exactly as your coach sent it..."></textarea>
@@ -231,6 +234,18 @@ button {
   </div>
 
 <script>
+
+/* =========================================
+   FILL THIS IN ONCE
+   Your GitHub username, this repo's name,
+   and the branch Pages deploys from
+   (usually "main").
+   ========================================= */
+const GITHUB_OWNER = "SC18347";
+const GITHUB_REPO = "Cross Country Team";
+const GITHUB_BRANCH = "main";
+
+
 /* =========================================
    PIN LOCK
    ========================================= */
@@ -497,6 +512,18 @@ document.getElementById("generate-btn").addEventListener("click", () => {
   output.style.display = "block";
   document.getElementById("copy-btn").style.display = "block";
 });
+document.getElementById("publish-btn").addEventListener("click", () => {
+  const code = document.getElementById("output-box").textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    if (GITHUB_OWNER === "your-github-username") {
+      alert("Add your GitHub username and repo name at the top of the script first (look for GITHUB_OWNER and GITHUB_REPO).");
+      return;
+    }
+    const url = `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/edit/${GITHUB_BRANCH}/index.html`;
+    window.open(url, "_blank");
+  });
+});
+
 
 document.getElementById("copy-btn").addEventListener("click", () => {
   const text = document.getElementById("output-box").textContent;
