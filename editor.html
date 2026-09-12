@@ -33,6 +33,8 @@ body {
   font-family: 'Rajdhani', sans-serif;
   -webkit-font-smoothing: antialiased;
 }
+
+/* ===== HEADER ===== */
 .page-header { text-align: center; padding: 40px 20px 10px; }
 .status-tag {
   display: inline-flex; align-items: center; gap: 8px;
@@ -56,9 +58,93 @@ body {
   font-weight: 700; font-size: 1.4rem; letter-spacing: 0.05em;
   text-shadow: 0 0 18px var(--cyan-soft);
 }
+
 .editor-wrap { max-width: 480px; margin: 0 auto; padding: 10px 16px 60px; }
-.hint { font-size: 0.92rem; color: var(--muted); line-height: 1.5; margin-bottom: 20px; }
-.hint code { background: var(--panel); padding: 1px 5px; border-radius: 4px; color: var(--cyan); }
+
+/* ===== LOCK SCREEN ===== */
+#lock-screen { text-align: center; margin-top: 40px; }
+
+/* ===== SHARED BUTTON STYLE ===== */
+button {
+  width: 100%; padding: 14px; border: none; border-radius: 10px;
+  font-family: 'Orbitron', sans-serif; font-weight: 600;
+  letter-spacing: 0.04em; font-size: 0.95rem; cursor: pointer;
+}
+#unlock-btn { background: var(--panel); border: 1px solid var(--cyan); color: var(--cyan); }
+#generate-btn { background: var(--cyan); color: #04121a; margin-top: 4px; }
+#copy-btn { background: var(--amber); color: #221200; margin-top: 12px; display: none; }
+#parse-btn { background: var(--panel); border: 1px solid var(--cyan); color: var(--cyan); margin-top: 10px; }
+
+/* ===== PIN OVERLAY ===== */
+.pin-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(6, 10, 16, 0.92);
+  align-items: center; justify-content: center;
+  z-index: 100; padding: 20px;
+}
+.pin-overlay.open { display: flex; }
+.pin-modal {
+  background: var(--panel); border: 1px solid var(--panel-border);
+  border-radius: 20px; padding: 32px 24px; text-align: center;
+  width: 100%; max-width: 280px;
+}
+.pin-dots { display: flex; justify-content: center; gap: 14px; margin-bottom: 18px; }
+.dot {
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 2px solid var(--cyan); background: transparent;
+  transition: background 0.15s;
+}
+.dot.filled { background: var(--cyan); }
+.pin-message {
+  font-family: 'Share Tech Mono', monospace; font-size: 0.85rem;
+  letter-spacing: 0.08em; color: var(--muted);
+  min-height: 20px; margin-bottom: 20px;
+}
+.pin-message.error { color: var(--amber); }
+.pin-message.success { color: var(--cyan); }
+.pin-keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.key {
+  padding: 16px 0; border-radius: 12px;
+  border: 1px solid var(--panel-border); background: #050a0f;
+  color: var(--text); font-family: 'Rajdhani', sans-serif;
+  font-size: 1.3rem; font-weight: 600; cursor: pointer;
+}
+.key:active { background: var(--cyan-soft); }
+.key-ghost { background: transparent; border: none; color: var(--muted); font-size: 0.8rem; }
+
+/* ===== EDITOR CONTENT (hidden until unlocked) ===== */
+#editor-content { display: none; }
+
+.panel-block {
+  background: var(--panel); border: 1px solid var(--panel-border);
+  border-radius: 14px; padding: 16px; margin: 20px 0;
+}
+.panel-block label {
+  display: block; font-family: 'Share Tech Mono', monospace;
+  font-size: 0.68rem; letter-spacing: 0.08em; color: var(--muted);
+  margin-bottom: 6px;
+}
+#raw-paste {
+  width: 100%; background: #050a0f; border: 1px solid var(--panel-border);
+  border-radius: 8px; color: var(--text); font-family: 'Rajdhani', sans-serif;
+  font-size: 0.95rem; padding: 10px; resize: vertical;
+}
+
+.hint { font-size: 0.9rem; color: var(--muted); line-height: 1.5; margin: 14px 0; }
+
+#leftover-wrap { margin-top: 14px; }
+.leftover-line {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  background: #050a0f; border: 1px solid var(--panel-border);
+  border-radius: 8px; padding: 8px 10px; margin-bottom: 8px;
+  font-size: 0.85rem;
+}
+.leftover-text { flex: 1; word-break: break-word; }
+.leftover-select {
+  background: var(--panel); color: var(--text); border: 1px solid var(--panel-border);
+  border-radius: 6px; font-family: 'Rajdhani', sans-serif; font-size: 0.8rem; padding: 4px;
+}
+
 .day-row {
   background: var(--panel); border: 1px solid var(--panel-border);
   border-radius: 12px; padding: 14px 16px; margin-bottom: 14px;
@@ -76,13 +162,7 @@ body {
   font-size: 1rem; padding: 9px 10px;
 }
 .day-row textarea { resize: vertical; min-height: 56px; }
-button {
-  width: 100%; padding: 14px; border: none; border-radius: 10px;
-  font-family: 'Orbitron', sans-serif; font-weight: 600;
-  letter-spacing: 0.04em; font-size: 0.95rem; cursor: pointer;
-}
-#generate-btn { background: var(--cyan); color: #04121a; margin-top: 4px; }
-#copy-btn { background: var(--amber); color: #221200; margin-top: 12px; display: none; }
+
 .output-box {
   margin-top: 16px; background: #050a0f;
   border: 1px solid var(--panel-border); border-radius: 10px; padding: 14px;
@@ -99,73 +179,334 @@ button {
   </header>
 
   <div class="editor-wrap">
-    <p class="hint">
-      Fill in each day below, tap <strong>Generate Code</strong>, then copy the
-      result and paste it into <code>index.html</code> — swap out everything
-      between <code>const workouts = [</code> and the matching <code>];</code>.
-    </p>
 
-    <div id="day-rows"></div>
+    <div id="lock-screen">
+      <button id="unlock-btn">🔒 Unlock Editor</button>
+    </div>
 
-    <button id="generate-btn">Generate Code</button>
-    <div class="output-box" id="output-box"></div>
-    <button id="copy-btn">Copy to Clipboard</button>
+    <div class="pin-overlay" id="pin-overlay">
+      <div class="pin-modal">
+        <div class="pin-dots">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        </div>
+        <div class="pin-message" id="pin-message">Enter Code</div>
+        <div class="pin-keypad">
+          <button class="key" data-key="1">1</button>
+          <button class="key" data-key="2">2</button>
+          <button class="key" data-key="3">3</button>
+          <button class="key" data-key="4">4</button>
+          <button class="key" data-key="5">5</button>
+          <button class="key" data-key="6">6</button>
+          <button class="key" data-key="7">7</button>
+          <button class="key" data-key="8">8</button>
+          <button class="key" data-key="9">9</button>
+          <button class="key key-ghost" data-key="cancel">Cancel</button>
+          <button class="key" data-key="0">0</button>
+          <button class="key key-ghost" data-key="back">⌫</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="editor-content">
+
+      <div class="panel-block">
+        <label>Paste your coach's schedule text</label>
+        <textarea id="raw-paste" rows="8" placeholder="Paste everything here, exactly as your coach sent it..."></textarea>
+        <button id="parse-btn">Extract Dates &amp; Times</button>
+      </div>
+
+      <div id="leftover-wrap" style="display:none;">
+        <p class="hint">These lines couldn't be auto-placed — pick a day for each one:</p>
+        <div id="leftover-list"></div>
+      </div>
+
+      <p class="hint">Check every day below (dates, times, workouts), then generate your code.</p>
+
+      <div id="day-rows"></div>
+
+      <button id="generate-btn">Generate Code</button>
+      <div class="output-box" id="output-box"></div>
+      <button id="copy-btn">Copy to Clipboard</button>
+    </div>
   </div>
 
 <script>
-  function toLocalISODate(d) {
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    return `${y}-${m}-${day}`;
+/* =========================================
+   PIN LOCK
+   ========================================= */
+const CORRECT_PIN = "8746";
+let enteredPin = "";
+
+const pinOverlay = document.getElementById("pin-overlay");
+const pinMessage = document.getElementById("pin-message");
+const dots = document.querySelectorAll(".dot");
+
+document.getElementById("unlock-btn").addEventListener("click", () => {
+  enteredPin = "";
+  updateDots();
+  setPinMessage("Enter Code", "");
+  pinOverlay.classList.add("open");
+});
+
+pinOverlay.addEventListener("click", (e) => {
+  if (e.target === pinOverlay) pinOverlay.classList.remove("open");
+});
+
+document.querySelectorAll(".key[data-key]").forEach(btn => {
+  btn.addEventListener("click", () => handleKey(btn.dataset.key));
+});
+
+document.addEventListener("keydown", (e) => {
+  if (!pinOverlay.classList.contains("open")) return;
+  if (/^[0-9]$/.test(e.key)) handleKey(e.key);
+  else if (e.key === "Backspace") handleKey("back");
+  else if (e.key === "Escape") handleKey("cancel");
+});
+
+function handleKey(key) {
+  if (key === "cancel") { pinOverlay.classList.remove("open"); return; }
+  if (key === "back") { enteredPin = enteredPin.slice(0, -1); updateDots(); return; }
+  if (enteredPin.length >= 4) return;
+
+  enteredPin += key;
+  updateDots();
+  if (enteredPin.length === 4) checkPin();
+}
+
+function updateDots() {
+  dots.forEach((dot, i) => dot.classList.toggle("filled", i < enteredPin.length));
+}
+
+function setPinMessage(text, cls) {
+  pinMessage.textContent = text;
+  pinMessage.className = "pin-message" + (cls ? " " + cls : "");
+}
+
+function checkPin() {
+  if (enteredPin === CORRECT_PIN) {
+    setPinMessage("Confirmed", "success");
+    setTimeout(() => {
+      pinOverlay.classList.remove("open");
+      document.getElementById("lock-screen").style.display = "none";
+      document.getElementById("editor-content").style.display = "block";
+    }, 600);
+  } else {
+    setPinMessage("Incorrect", "error");
+    setTimeout(() => {
+      enteredPin = "";
+      updateDots();
+      setPinMessage("Enter Code", "");
+    }, 900);
+  }
+}
+
+/* =========================================
+   DEFAULT DAY ROWS
+   ========================================= */
+function toLocalISODate(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+function createDayRow(dateVal, timeVal) {
+  const row = document.createElement("div");
+  row.className = "day-row";
+  row.innerHTML = `
+    <label>Date</label>
+    <input type="date" class="f-date" value="${dateVal || ""}">
+    <label>Practice Time</label>
+    <input type="text" class="f-time" value="${timeVal || ""}" placeholder="3:30 PM">
+    <label>Workout (leave blank for a rest day)</label>
+    <textarea class="f-workout"></textarea>
+  `;
+  return row;
+}
+
+const rowsContainer = document.getElementById("day-rows");
+const today = new Date();
+for (let i = 0; i < 7; i++) {
+  const d = new Date(today);
+  d.setDate(d.getDate() + i);
+  rowsContainer.appendChild(createDayRow(toLocalISODate(d), ""));
+}
+
+/* =========================================
+   PASTE & PARSE
+   Pulls out "Mon, 6:30 / Aug / 24"-style day
+   headers reliably. Workout paragraphs get
+   left in a pile below for you to route to
+   the right day with one tap each — coach
+   pastes are too inconsistent to guess that
+   part automatically without risking a mixup.
+   ========================================= */
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const DAY_LINE = /^(Sun|Mon|Tue|Wed|Thu|Fri|Sat)[a-z]*\.?,?\s*(.*)$/i;
+
+function escapeHtml(str) {
+  const d = document.createElement("div");
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+function guessYear(monthAbbr, dayNum) {
+  const monthIndex = MONTHS.indexOf(monthAbbr);
+  const now = new Date();
+  if (monthIndex === -1 || !dayNum) return now.getFullYear();
+  let year = now.getFullYear();
+  const candidate = new Date(year, monthIndex, parseInt(dayNum, 10));
+  const fourMonthsAgo = new Date(now);
+  fourMonthsAgo.setMonth(fourMonthsAgo.getMonth() - 4);
+  if (candidate < fourMonthsAgo) year += 1;
+  return year;
+}
+
+function parseHeader(rawText) {
+  const lines = rawText.split("\n").map(l => l.trim()).filter(l => l.length > 0);
+  const found = [];
+  let lastAmPm = "AM";
+  let lastMonth = "";
+  let i = 0;
+
+  while (i < lines.length && DAY_LINE.test(lines[i])) {
+    const m = lines[i].match(DAY_LINE);
+    const dayAbbr = m[1];
+    let rest = m[2];
+    let time = "", month = "", dayNum = "";
+
+    const monthInline = MONTHS.find(mo => rest.includes(mo));
+    if (monthInline) {
+      month = monthInline;
+      const numMatch = rest.match(/(\d{1,2})/);
+      if (numMatch) dayNum = numMatch[1];
+    } else {
+      time = rest;
+    }
+
+    let needMonth = !month, needDayNum = !dayNum, needAmPm = time && !/AM|PM/i.test(time);
+    let j = i + 1, steps = 0;
+    while (j < lines.length && steps < 3 && !DAY_LINE.test(lines[j]) && (needMonth || needDayNum || needAmPm)) {
+      const line = lines[j];
+      const mo = MONTHS.find(m2 => line.includes(m2));
+      if (mo && !month) { month = mo; needMonth = false; }
+      const ampm = line.match(/AM|PM/i);
+      if (ampm) { time = (time ? time + " " : "") + ampm[0].toUpperCase(); needAmPm = false; }
+      const numOnly = line.match(/^(\d{1,2})$/);
+      if (numOnly && !dayNum) { dayNum = numOnly[1]; needDayNum = false; }
+      j++; steps++;
+    }
+
+    if (time && !/AM|PM/i.test(time)) { time = time + " " + lastAmPm; }
+    else if (/AM|PM/i.test(time)) { lastAmPm = time.match(/AM|PM/i)[0].toUpperCase(); }
+
+    const resolvedMonth = month || lastMonth;
+    if (resolvedMonth) lastMonth = resolvedMonth;
+
+    found.push({ dayAbbr, time: time.trim(), month: resolvedMonth, dayNum });
+    i = j;
   }
 
-  const rowsContainer = document.getElementById("day-rows");
-  const today = new Date();
+  return { headerRows: found, leftoverLines: lines.slice(i) };
+}
 
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(today);
-    d.setDate(d.getDate() + i);
+function rebuildDayRows(headerRows) {
+  rowsContainer.innerHTML = "";
+  headerRows.forEach(h => {
+    const monthIndex = MONTHS.indexOf(h.month);
+    const year = guessYear(h.month, h.dayNum);
+    const iso = (monthIndex >= 0 && h.dayNum)
+      ? `${year}-${String(monthIndex + 1).padStart(2, "0")}-${String(h.dayNum).padStart(2, "0")}`
+      : "";
+    rowsContainer.appendChild(createDayRow(iso, h.time));
+  });
+}
 
-    const row = document.createElement("div");
-    row.className = "day-row";
-    row.innerHTML = `
-      <label>Date</label>
-      <input type="date" class="f-date" value="${toLocalISODate(d)}">
-      <label>Practice Time</label>
-      <input type="text" class="f-time" placeholder="3:30 PM">
-      <label>Workout (leave blank for a rest day)</label>
-      <textarea class="f-workout"></textarea>
+function renderLeftovers(lines) {
+  const wrap = document.getElementById("leftover-wrap");
+  const list = document.getElementById("leftover-list");
+  list.innerHTML = "";
+
+  if (lines.length === 0) { wrap.style.display = "none"; return; }
+  wrap.style.display = "block";
+
+  lines.forEach(line => {
+    const item = document.createElement("div");
+    item.className = "leftover-line";
+
+    let options = `<option value="">Add to day…</option>`;
+    document.querySelectorAll(".day-row").forEach((row, idx) => {
+      const dateVal = row.querySelector(".f-date").value;
+      let label = "Row " + (idx + 1);
+      if (dateVal) {
+        const d = new Date(dateVal + "T00:00:00");
+        label = d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+      }
+      options += `<option value="${idx}">${label}</option>`;
+    });
+
+    item.innerHTML = `
+      <span class="leftover-text">${escapeHtml(line)}</span>
+      <select class="leftover-select">${options}</select>
     `;
-    rowsContainer.appendChild(row);
+    list.appendChild(item);
+  });
+
+  list.querySelectorAll(".leftover-select").forEach(select => {
+    select.addEventListener("change", (e) => {
+      const idx = e.target.value;
+      if (idx === "") return;
+      const text = e.target.closest(".leftover-line").querySelector(".leftover-text").textContent;
+      const rows = document.querySelectorAll(".day-row");
+      const workoutBox = rows[idx].querySelector(".f-workout");
+      workoutBox.value = workoutBox.value ? workoutBox.value + "\n" + text : text;
+      e.target.closest(".leftover-line").remove();
+    });
+  });
+}
+
+document.getElementById("parse-btn").addEventListener("click", () => {
+  const raw = document.getElementById("raw-paste").value;
+  const { headerRows, leftoverLines } = parseHeader(raw);
+
+  if (headerRows.length === 0) {
+    alert('Couldn\'t find day patterns like "Mon, 6:30" in that text — fill the days in below by hand instead.');
+    return;
   }
 
-  document.getElementById("generate-btn").addEventListener("click", () => {
-    const rows = document.querySelectorAll(".day-row");
-    let code = "const workouts = [\n";
-    rows.forEach(row => {
-      const date = row.querySelector(".f-date").value;
-      const time = row.querySelector(".f-time").value.trim() || "—";
-      const workout = row.querySelector(".f-workout").value.trim().replace(/"/g, '\\"');
-      code += `  { date: "${date}", time: "${time}", workout: "${workout}" },\n`;
-    });
-    code += "];";
+  rebuildDayRows(headerRows);
+  renderLeftovers(leftoverLines);
+});
 
-    const output = document.getElementById("output-box");
-    output.textContent = code;
-    output.style.display = "block";
-    document.getElementById("copy-btn").style.display = "block";
+/* =========================================
+   GENERATE CODE
+   ========================================= */
+document.getElementById("generate-btn").addEventListener("click", () => {
+  const rows = document.querySelectorAll(".day-row");
+  let code = "const workouts = [\n";
+  rows.forEach(row => {
+    const date = row.querySelector(".f-date").value;
+    const time = row.querySelector(".f-time").value.trim() || "—";
+    const workout = row.querySelector(".f-workout").value.trim().replace(/"/g, '\\"');
+    code += `  { date: "${date}", time: "${time}", workout: "${workout}" },\n`;
   });
+  code += "];";
 
-  document.getElementById("copy-btn").addEventListener("click", () => {
-    const text = document.getElementById("output-box").textContent;
-    navigator.clipboard.writeText(text).then(() => {
-      const btn = document.getElementById("copy-btn");
-      const original = btn.textContent;
-      btn.textContent = "Copied!";
-      setTimeout(() => { btn.textContent = original; }, 1500);
-    });
+  const output = document.getElementById("output-box");
+  output.textContent = code;
+  output.style.display = "block";
+  document.getElementById("copy-btn").style.display = "block";
+});
+
+document.getElementById("copy-btn").addEventListener("click", () => {
+  const text = document.getElementById("output-box").textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById("copy-btn");
+    const original = btn.textContent;
+    btn.textContent = "Copied!";
+    setTimeout(() => { btn.textContent = original; }, 1500);
   });
+});
 </script>
 </body>
 </html>
