@@ -10,6 +10,30 @@
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
 <style>
+
+.nav-menu { position: fixed; top: 16px; left: 16px; z-index: 210; }
+.nav-toggle {
+  padding: 10px 14px;
+  background: var(--panel); border: 1px solid var(--panel-border);
+  color: var(--cyan); border-radius: 999px;
+  font-size: 1.1rem; line-height: 1; cursor: pointer;
+}
+.nav-dropdown {
+  display: none;
+  position: absolute; top: calc(100% + 8px); left: 0;
+  background: var(--panel); border: 1px solid var(--panel-border);
+  border-radius: 14px; padding: 8px; min-width: 170px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+.nav-dropdown.open { display: flex; flex-direction: column; gap: 2px; }
+.nav-dropdown a {
+  display: block; padding: 10px 12px; border-radius: 8px;
+  color: var(--text); text-decoration: none;
+  font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: 0.95rem;
+}
+.nav-dropdown a:active { background: var(--cyan-soft); }
+
+
 :root {
   --bg: #060a10;
   --grid-line: rgba(61, 220, 255, 0.05);
@@ -130,6 +154,17 @@ body {
 </head>
 <body>
 
+<div class="nav-menu">
+  <button id="nav-toggle" class="nav-toggle" aria-label="Menu" aria-expanded="false">☰</button>
+  <div id="nav-dropdown" class="nav-dropdown">
+    <a href="index.html">🏠 Schedule</a>
+    <a href="health-bot.html">🤖 Health Bot</a>
+    <a href="community.html">📸 Community</a>
+    <a href="suggestion-box.html">💡 Suggestion Box</a>
+  </div>
+</div>
+
+
   <a href="index.html" class="back-link">← Schedule</a>
 
   <header class="page-header">
@@ -142,6 +177,26 @@ body {
   <div id="chat-options"></div>
 
 <script>
+
+(function () {
+  const toggle = document.getElementById("nav-toggle");
+  const dropdown = document.getElementById("nav-dropdown");
+  toggle.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const isOpen = dropdown.classList.toggle("open");
+    toggle.textContent = isOpen ? "✕" : "☰";
+    toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+  });
+  document.addEventListener("click", (e) => {
+    if (!dropdown.contains(e.target) && e.target !== toggle) {
+      dropdown.classList.remove("open");
+      toggle.textContent = "☰";
+      toggle.setAttribute("aria-expanded", "false");
+    }
+  });
+})();
+
+
 /* =========================================
    HEALTH BOT — CONVERSATION DATA
    Unchanged — add more topics here anytime.
