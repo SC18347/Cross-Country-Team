@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Community</title>
+
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#060a10">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #060a10;
+  --grid-line: rgba(61, 220, 255, 0.05);
+  --panel: #0c141d;
+  --panel-border: rgba(61, 220, 255, 0.28);
+  --cyan: #3ddcff;
+  --cyan-soft: rgba(61, 220, 255, 0.15);
+  --amber: #ffb454;
+  --text: #d7eef5;
+  --muted: #6f93a3;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 34px 34px;
+  color: var(--text);
+  font-family: 'Rajdhani', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.nav-menu { position: fixed; top: 16px; left: 16px; z-index: 210; }
+.nav-toggle {
+  padding: 10px 14px;
+  background: var(--panel); border: 1px solid var(--panel-border);
+  color: var(--cyan); border-radius: 999px;
+  font-size: 1.1rem; line-height: 1; cursor: pointer;
+}
+.nav-dropdown {
+  display: none;
+  position: absolute; top: calc(100% + 8px); left: 0;
+  background: var(--panel); border: 1px solid var(--panel-border);
+  border-radius: 14px; padding: 8px; min-width: 170px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+.nav-dropdown.open { display: flex; flex-direction: column; gap: 2px; }
+.nav-dropdown a {
+  display: block; padding: 10px 12px; border-radius: 8px;
+  color: var(--text); text-decoration: none;
+  font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: 0.95rem;
+}
+.nav-dropdown a:active { background: var(--cyan-soft); }
+
+.page-header { text-align: center; padding: 40px 20px 10px; }
+.status-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.7rem; letter-spacing: 0.12em;
+  color: var(--cyan);
+  border: 1px solid var(--panel-border);
+  padding: 5px 14px; border-radius: 999px;
+  background: var(--cyan-soft);
+}
+.status-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--cyan); box-shadow: 0 0 8px var(--cyan);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+@media (prefers-reduced-motion: reduce) { .status-dot { animation: none; } }
+.page-header h1 {
+  margin: 16px 0 6px;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700; font-size: 1.5rem; letter-spacing: 0.05em;
+  text-shadow: 0 0 18px var(--cyan-soft);
+}
+.hud-sub { font-size: 0.8rem; color: var(--muted); }
+
+.wrap { max-width: 480px; margin: 0 auto; padding: 10px 16px 50px; }
+
+.panel-block {
+  background: var(--panel); border: 1px solid var(--panel-border);
+  border-radius: 16px; padding: 16px; margin-bottom: 22px;
+}
+.panel-block textarea {
+  width: 100%; background: #050a0f;
+  border: 1px solid var(--panel-border); border-radius: 8px;
+  color: var(--text); font-family: 'Rajdhani', sans-serif;
+  font-size: 1rem; padding: 10px; resize: vertical; min-height: 70px;
+}
+.panel-block input[type="text"] {
+  width: 100%; background: #050a0f;
+  border: 1px solid var(--panel-border); border-radius: 8px;
+  color: var(--text); font-family: 'Rajdhani', sans-serif;
+  font-size: 0.95rem; padding: 9px 10px; margin-bottom: 10px;
+}
+.composer-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+.photo-picker-btn {
+  padding: 9px 14px;
+  background: transparent; border: 1px solid var(--cyan); color: var(--cyan);
+  border-radius: 999px; font-size: 0.8rem; font-weight: 600; cursor: pointer;
+}
+#post-btn {
+  margin-left: auto; padding: 10px 20px; border: none;
+  background: var(--cyan); color: #04121a; border-radius: 999px;
+  font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 0.85rem; cursor: pointer;
+}
+#post-btn:disabled { opacity: 0.5; }
+#photo-preview { width: 100%; border-radius: 10px; margin-top: 10px; display: none; }
+
+.post-card {
+  background: var(--panel); border: 1px solid var(--panel-border);
+  border-radius: 14px; padding: 14px 16px; margin-bottom: 12px;
+}
+.post-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.post-name { font-family: 'Orbitron', sans-serif; font-weight: 600; font-size: 0.82rem; color: var(--cyan); }
+.post-time { font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; color: var(--muted); white-space: nowrap; }
+.post-text { margin-top: 6px; line-height: 1.4; white-space: pre-line; }
+.post-photo { width: 100%; border-radius: 10px; margin-top: 10px; display: block; }
+.post-delete {
+  margin-top: 8px; background: none; border: none; color: var(--muted);
+  font-size: 0.75rem; cursor: pointer; padding: 0;
+}
+.post-delete:active { color: var(--amber); }
+.empty-state { text-align: center; color: var(--muted); font-size: 0.9rem; padding: 20px 10px; }
+</style>
+</head>
+<body>
+
+  <div class="nav-menu">
+    <button id="nav-toggle" class="nav-toggle" aria-label="Menu" aria-expanded="false">☰</button>
+    <div id="nav-dropdown" class="nav-dropdown">
+      <a href="index.html">🏠 Schedule</a>
+      <a href="health-bot.html">🤖 Health Bot</a>
+      <a href="community.html">📸 Community</a>
+      <a href="suggestion-box.html">💡 Suggestion Box</a>
+    </div>
+  </div>
+
+  <header class="page-header">
+    <div class="status-tag"><span class="status-dot"></span>COMMUNITY LIVE</div>
+    <h1>COMMUNITY</h1>
+    <div class="hud-sub">Photos &amp; messages from practices and meets</div>
+  </header>
+
+  <div class="wrap">
+    <div class="panel-block">
+      <input type="text" id="post-name" placeholder="Your name (optional)">
+      <textarea id="post-text" placeholder="What's happening?"></textarea>
+      <div class="composer-row">
+        <label for="photo-input" class="photo-picker-btn">📷 Add Photo</label>
+        <input type="file" id="photo-input" accept="image/*" style="display:none;">
+        <button id="post-btn">Post</button>
+      </div>
+      <img id="photo-preview" alt="">
+    </div>
+
+    <div id="feed"></div>
+  </div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import {
+  getFirestore, collection, addDoc, deleteDoc, doc,
+  query, orderBy, onSnapshot, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import {
+  getAuth, signInAnonymously, onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+
+/* =========================================
+   PASTE YOUR firebaseConfig FROM STEP 3 HERE
+   ========================================= */
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+let currentUser = null;
+signInAnonymously(auth).catch((err) => console.error("Sign-in failed:", err));
+onAuthStateChanged(auth, (user) => { currentUser = user; });
+
+/* ===== nav menu ===== */
+(function () {
+  const toggle = document.getElementById("nav-toggle");
+  const dropdown = document.getElementById("nav-dropdown");
+  toggle.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const isOpen = dropdown.classList.toggle("open");
+    toggle.textContent = isOpen ? "✕" : "☰";
+    toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+  });
+  document.addEventListener("click", (e) => {
+    if (!dropdown.contains(e.target) && e.target !== toggle) {
+      dropdown.classList.remove("open");
+      toggle.textContent = "☰";
+      toggle.setAttribute("aria-expanded", "false");
+    }
+  });
+})();
+
+function escapeHtml(str) {
+  const d = document.createElement("div");
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+/* =========================================
+   PHOTO COMPRESSION
+   Shrinks + compresses the photo in the
+   browser, then hands back a data string
+   small enough to fit in the free database
+   (no Storage/Blaze plan needed at all).
+   ========================================= */
+function resizeImage(file, maxWidth, quality) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(1, maxWidth / img.width);
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function getCompressedPhoto(file) {
+  let dataUrl = await resizeImage(file, 700, 0.6);
+  if (dataUrl.length > 700000) dataUrl = await resizeImage(file, 500, 0.5);
+  if (dataUrl.length > 700000) throw new Error("PHOTO_TOO_LARGE");
+  return dataUrl;
+}
+
+/* ===== photo preview ===== */
+const photoInput = document.getElementById("photo-input");
+const photoPreview = document.getElementById("photo-preview");
+photoInput.addEventListener("change", () => {
+  const file = photoInput.files[0];
+  if (!file) { photoPreview.style.display = "none"; return; }
+  photoPreview.src = URL.createObjectURL(file);
+  photoPreview.style.display = "block";
+});
+
+/* ===== posting ===== */
+const postBtn = document.getElementById("post-btn");
+postBtn.addEventListener("click", async () => {
+  const name = document.getElementById("post-name").value.trim() || "Anonymous";
+  const text = document.getElementById("post-text").value.trim();
+  const file = photoInput.files[0];
+  if (!text && !file) return;
+  if (!currentUser) { alert("Still connecting — try again in a second."); return; }
+
+  postBtn.disabled = true;
+  postBtn.textContent = "Posting...";
+  try {
+    const postData = { name, text, uid: currentUser.uid, createdAt: serverTimestamp() };
+    if (file) {
+      postBtn.textContent = "Compressing photo...";
+      postData.photoData = await getCompressedPhoto(file);
+    }
+    await addDoc(collection(db, "posts"), postData);
+    document.getElementById("post-text").value = "";
+    photoInput.value = "";
+    photoPreview.style.display = "none";
+  } catch (err) {
+    console.error(err);
+    alert(err.message === "PHOTO_TOO_LARGE"
+      ? "That photo's too large even compressed — try a different one."
+      : "Couldn't post — check your connection and try again.");
+  } finally {
+    postBtn.disabled = false;
+    postBtn.textContent = "Post";
+  }
+});
+
+/* ===== live feed ===== */
+const feedEl = document.getElementById("feed");
+const postsQuery = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+
+onSnapshot(postsQuery, (snapshot) => {
+  if (snapshot.empty) {
+    feedEl.innerHTML = '<div class="empty-state">No posts yet — be the first!</div>';
+    return;
+  }
+  feedEl.innerHTML = "";
+  snapshot.forEach((docSnap) => {
+    const post = docSnap.data();
+    const isMine = currentUser && post.uid === currentUser.uid;
+    const time = post.createdAt
+      ? post.createdAt.toDate().toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })
+      : "just now";
+
+    const card = document.createElement("div");
+    card.className = "post-card";
+    card.innerHTML = `
+      <div class="post-top">
+        <span class="post-name">${escapeHtml(post.name || "Anonymous")}</span>
+        <span class="post-time">${time}</span>
+      </div>
+      ${post.text ? `<div class="post-text">${escapeHtml(post.text)}</div>` : ""}
+      ${post.photoData ? `<img class="post-photo" src="${post.photoData}" alt="">` : ""}
+      ${isMine ? `<button class="post-delete" data-id="${docSnap.id}">🗑️ Delete my post</button>` : ""}
+    `;
+    feedEl.appendChild(card);
+  });
+
+  feedEl.querySelectorAll(".post-delete").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      if (confirm("Delete this post?")) {
+        await deleteDoc(doc(db, "posts", btn.dataset.id));
+      }
+    });
+  });
+});
+
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
+</script>
+</body>
+</html>
