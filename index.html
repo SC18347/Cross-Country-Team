@@ -138,23 +138,24 @@ body {
 .site-footer a:hover { opacity: 1; color: var(--cyan); }
 
 .health-bot-btn {
-  position: fixed; top: 16px; right: 16px; z-index: 50;
-  display: inline-flex; align-items: center; gap: 6px;
-  background: var(--amber); color: #221200;
-  padding: 8px 14px; border-radius: 999px;
-  font-family: 'Orbitron', sans-serif; font-weight: 700;
-  font-size: 0.72rem; letter-spacing: 0.03em;
-  text-decoration: none;
-  box-shadow: 0 0 16px rgba(255, 180, 84, 0.45);
+  position: fixed;
+  bottom: calc(20px + env(safe-area-inset-bottom));
+  right: 20px; z-index: 50;
+  width: 56px; height: 56px; border-radius: 50%;
+  background: var(--amber);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem; text-decoration: none;
+  box-shadow: 0 4px 18px rgba(255, 180, 84, 0.5);
 }
-.health-bot-btn:active { transform: scale(0.97); }
+.health-bot-btn:active { transform: scale(0.94); }
 
 
 </style>
 </head>
 <body>
 
-<a href="health-bot.html" class="health-bot-btn">🤖 HEALTH BOT</a>
+<a href="health-bot.html" class="health-bot-btn" aria-label="Health Bot">🤖</a>
+
 
 
   <header class="page-header">
