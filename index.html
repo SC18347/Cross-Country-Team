@@ -136,9 +136,26 @@ body {
 }
 .site-footer a { color: var(--muted); text-decoration: none; opacity: 0.6; }
 .site-footer a:hover { opacity: 1; color: var(--cyan); }
+
+.health-bot-btn {
+  position: fixed; top: 16px; right: 16px; z-index: 50;
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--amber); color: #221200;
+  padding: 8px 14px; border-radius: 999px;
+  font-family: 'Orbitron', sans-serif; font-weight: 700;
+  font-size: 0.72rem; letter-spacing: 0.03em;
+  text-decoration: none;
+  box-shadow: 0 0 16px rgba(255, 180, 84, 0.45);
+}
+.health-bot-btn:active { transform: scale(0.97); }
+
+
 </style>
 </head>
 <body>
+
+<a href="health-bot.html" class="health-bot-btn">🤖 HEALTH BOT</a>
+
 
   <header class="page-header">
     <div class="status-tag"><span class="status-dot"></span>SYSTEM ONLINE</div>
@@ -156,7 +173,7 @@ body {
   </main>
 
   <footer class="site-footer">
-    <p>&copy; <span id="year"></span> SC Smith · <a href="health-bot.html">health bot</a> · <a href="editor.html">edit</a></p>
+    <p>&copy; <span id="year"></span> SC Smith · <a href="editor.html">edit</a></p>
   </footer>
 
 <script>
