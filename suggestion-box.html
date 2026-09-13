@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Suggestion Box</title>
+
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#060a10">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #060a10;
+  --grid-line: rgba(61, 220, 255, 0.05);
+  --panel: #0c141d;
+  --panel-border: rgba(61, 220, 255, 0.28);
+  --cyan: #3ddcff;
+  --cyan-soft: rgba(61, 220, 255, 0.15);
+  --amber: #ffb454;
+  --text: #d7eef5;
+  --muted: #6f93a3;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 34px 34px;
+  color: var(--text);
+  font-family: 'Rajdhani', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.nav-menu { position: fixed; top: 16px; left: 16px; z-index: 210; }
+.nav-toggle {
+  padding: 10px 14px;
+  background: var(--panel); border: 1px solid var(--panel-border);
+  color: var(--cyan); border-radius: 999px;
+  font-size: 1.1rem; line-height: 1; cursor: pointer;
+}
+.nav-dropdown {
+  display: none;
+  position: absolute; top: calc(100% + 8px); left: 0;
+  background: var(--panel); border: 1px solid var(--panel-border);
+  border-radius: 14px; padding: 8px; min-width: 170px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+.nav-dropdown.open { display: flex; flex-direction: column; gap: 2px; }
+.nav-dropdown a {
+  display: block; padding: 10px 12px; border-radius: 8px;
+  color: var(--text); text-decoration: none;
+  font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: 0.95rem;
+}
+.nav-dropdown a:active { background: var(--cyan-soft); }
+
+.page-header { text-align: center; padding: 40px 20px 10px; }
+.status-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.7rem; letter-spacing: 0.12em;
+  color: var(--cyan);
+  border: 1px solid var(--panel-border);
+  padding: 5px 14px; border-radius: 999px;
+  background: var(--cyan-soft);
+}
+.status-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--cyan); box-shadow: 0 0 8px var(--cyan);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+@media (prefers-reduced-motion: reduce) { .status-dot { animation: none; } }
+.page-header h1 {
+  margin: 16px 0 6px;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700; font-size: 1.5rem; letter-spacing: 0.05em;
+  text-shadow: 0 0 18px var(--cyan-soft);
+}
+.hud-sub { font-size: 0.8rem; color: var(--muted); }
+
+.form-wrap { max-width: 460px; margin: 10px auto 40px; padding: 0 16px; }
+.panel-block {
+  background: var(--panel); border: 1px solid var(--panel-border);
+  border-radius: 16px; padding: 20px;
+}
+.panel-block label {
+  display: block; font-family: 'Share Tech Mono', monospace;
+  font-size: 0.68rem; letter-spacing: 0.08em; color: var(--muted);
+  margin: 14px 0 6px;
+}
+.panel-block label:first-child { margin-top: 0; }
+.panel-block input,
+.panel-block select,
+.panel-block textarea {
+  width: 100%; background: #050a0f;
+  border: 1px solid var(--panel-border); border-radius: 8px;
+  color: var(--text); font-family: 'Rajdhani', sans-serif;
+  font-size: 1rem; padding: 10px;
+}
+.panel-block textarea { resize: vertical; min-height: 100px; }
+.panel-block button {
+  width: 100%; margin-top: 18px; padding: 14px; border: none;
+  border-radius: 10px; background: var(--cyan); color: #04121a;
+  font-family: 'Orbitron', sans-serif; font-weight: 700;
+  font-size: 0.95rem; letter-spacing: 0.03em; cursor: pointer;
+}
+.thank-you { display: none; text-align: center; padding: 30px 10px; }
+.thank-you .big { font-size: 2.2rem; }
+.thank-you p { color: var(--muted); margin-top: 8px; }
+</style>
+</head>
+<body>
+
+  <div class="nav-menu">
+    <button id="nav-toggle" class="nav-toggle" aria-label="Menu" aria-expanded="false">☰</button>
+    <div id="nav-dropdown" class="nav-dropdown">
+      <a href="index.html">🏠 Schedule</a>
+      <a href="health-bot.html">🤖 Health Bot</a>
+      <a href="community.html">📸 Community</a>
+      <a href="suggestion-box.html">💡 Suggestion Box</a>
+    </div>
+  </div>
+
+  <header class="page-header">
+    <div class="status-tag"><span class="status-dot"></span>SUGGESTIONS OPEN</div>
+    <h1>SUGGESTION BOX</h1>
+    <div class="hud-sub">Something broken? Got an idea? Tell us.</div>
+  </header>
+
+  <div class="form-wrap">
+    <div class="panel-block" id="form-panel">
+      <form id="suggestion-form">
+        <label>Your name (optional)</label>
+        <input type="text" id="s-name" placeholder="Optional">
+
+        <label>What's this about?</label>
+        <select id="s-category">
+          <option value="Something's broken">🐛 Something's broken</option>
+          <option value="New idea">💡 New idea</option>
+          <option value="Other feedback">💬 Other feedback</option>
+        </select>
+
+        <label>Details</label>
+        <textarea id="s-message" required placeholder="What should we fix or add?"></textarea>
+
+        <button type="submit">Send</button>
+      </form>
+    </div>
+
+    <div class="panel-block thank-you" id="thank-you">
+      <div class="big">📧</div>
+      <p>Your email app should be opening now — just hit <strong>Send</strong> there to finish.</p>
+    </div>
+  </div>
+
+<script>
+(function () {
+  const toggle = document.getElementById("nav-toggle");
+  const dropdown = document.getElementById("nav-dropdown");
+  toggle.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const isOpen = dropdown.classList.toggle("open");
+    toggle.textContent = isOpen ? "✕" : "☰";
+    toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+  });
+  document.addEventListener("click", (e) => {
+    if (!dropdown.contains(e.target) && e.target !== toggle) {
+      dropdown.classList.remove("open");
+      toggle.textContent = "☰";
+      toggle.setAttribute("aria-expanded", "false");
+    }
+  });
+})();
+
+/* =========================================
+   SUBMIT — no external service. Opens your
+   own email app with everything filled in.
+   Put your real email below first.
+   ========================================= */
+const YOUR_EMAIL = "YOUR_EMAIL_HERE";
+
+document.getElementById("suggestion-form").addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  if (YOUR_EMAIL === "YOUR_EMAIL_HERE") {
+    alert("Add your real email address to YOUR_EMAIL near the top of the script first.");
+    return;
+  }
+
+  const name = document.getElementById("s-name").value.trim() || "Anonymous";
+  const category = document.getElementById("s-category").value;
+  const message = document.getElementById("s-message").value.trim();
+
+  const subject = encodeURIComponent(`[Suggestion] ${category}`);
+  const body = encodeURIComponent(`From: ${name}\n\n${message}`);
+
+  window.location.href = `mailto:${YOUR_EMAIL}?subject=${subject}&body=${body}`;
+
+  document.getElementById("form-panel").style.display = "none";
+  document.getElementById("thank-you").style.display = "block";
+});
+
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
+</script>
+</body>
+</html>
