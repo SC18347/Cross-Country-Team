@@ -5,35 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Health Bot</title>
 
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#060a10">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
 <style>
-
-.nav-menu { position: fixed; top: 16px; left: 16px; z-index: 210; }
-.nav-toggle {
-  padding: 10px 14px;
-  background: var(--panel); border: 1px solid var(--panel-border);
-  color: var(--cyan); border-radius: 999px;
-  font-size: 1.1rem; line-height: 1; cursor: pointer;
-}
-.nav-dropdown {
-  display: none;
-  position: absolute; top: calc(100% + 8px); left: 0;
-  background: var(--panel); border: 1px solid var(--panel-border);
-  border-radius: 14px; padding: 8px; min-width: 170px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-}
-.nav-dropdown.open { display: flex; flex-direction: column; gap: 2px; }
-.nav-dropdown a {
-  display: block; padding: 10px 12px; border-radius: 8px;
-  color: var(--text); text-decoration: none;
-  font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: 0.95rem;
-}
-.nav-dropdown a:active { background: var(--cyan-soft); }
-
-
 :root {
   --bg: #060a10;
   --grid-line: rgba(61, 220, 255, 0.05);
@@ -63,17 +45,28 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ===== BACK LINK (fixed, top-left) ===== */
-.back-link {
-  position: fixed; top: 16px; left: 16px; z-index: 50;
-  display: inline-flex; align-items: center; gap: 4px;
+.nav-menu { position: fixed; top: 16px; left: 16px; z-index: 210; }
+.nav-toggle {
+  padding: 10px 14px;
   background: var(--panel); border: 1px solid var(--panel-border);
-  color: var(--cyan); padding: 8px 14px; border-radius: 999px;
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.7rem; letter-spacing: 0.04em; text-decoration: none;
+  color: var(--cyan); border-radius: 999px;
+  font-size: 1.1rem; line-height: 1; cursor: pointer;
 }
+.nav-dropdown {
+  display: none;
+  position: absolute; top: calc(100% + 8px); left: 0;
+  background: var(--panel); border: 1px solid var(--panel-border);
+  border-radius: 14px; padding: 8px; min-width: 170px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+.nav-dropdown.open { display: flex; flex-direction: column; gap: 2px; }
+.nav-dropdown a {
+  display: block; padding: 10px 12px; border-radius: 8px;
+  color: var(--text); text-decoration: none;
+  font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: 0.95rem;
+}
+.nav-dropdown a:active { background: var(--cyan-soft); }
 
-/* ===== HEADER — compact, fixed height ===== */
 .page-header { flex: 0 0 auto; text-align: center; padding: 18px 90px 10px; }
 .status-tag {
   display: inline-flex; align-items: center; gap: 8px;
@@ -102,7 +95,6 @@ body {
 }
 .hud-sub { font-size: 0.76rem; color: var(--muted); }
 
-/* ===== CHAT LOG — grows to fill nearly the whole page ===== */
 #chat-log {
   flex: 1 1 auto;
   overflow-y: auto;
@@ -132,40 +124,48 @@ body {
 }
 .bubble.typing { animation: pulse 1s ease-in-out infinite; }
 
-/* ===== OPTIONS — anchored bar at the very bottom ===== */
-#chat-options {
+.chip-row { display: flex; flex-wrap: wrap; gap: 8px; padding: 2px 2px 4px; }
+.chip {
+  padding: 8px 13px; border-radius: 999px;
+  background: var(--panel); border: 1px solid var(--cyan);
+  color: var(--cyan); font-family: 'Rajdhani', sans-serif;
+  font-weight: 600; font-size: 0.82rem; cursor: pointer;
+}
+.chip:active { background: var(--cyan-soft); }
+
+#chat-input-bar {
   flex: 0 0 auto;
-  display: flex; flex-wrap: wrap; gap: 8px;
-  padding: 14px 16px calc(14px + env(safe-area-inset-bottom));
-  max-width: 600px;
-  width: 100%;
-  margin: 0 auto;
+  display: flex; gap: 8px; align-items: center;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  max-width: 600px; width: 100%; margin: 0 auto;
   border-top: 1px solid var(--panel-border);
   background: rgba(6, 10, 16, 0.9);
 }
-.chat-option {
-  width: auto; padding: 10px 16px;
-  background: var(--panel); border: 1px solid var(--cyan); color: var(--cyan);
-  border-radius: 999px; font-family: 'Rajdhani', sans-serif;
-  font-weight: 600; font-size: 0.85rem; cursor: pointer;
+#chat-input {
+  flex: 1; min-width: 0;
+  background: #0f1822; border: 1px solid var(--panel-border);
+  border-radius: 999px; padding: 12px 16px;
+  color: var(--text); font-family: 'Rajdhani', sans-serif; font-size: 1rem;
 }
-.chat-option:active { background: var(--cyan-soft); }
+#chat-input:focus { outline: none; border-color: var(--cyan); }
+#chat-send {
+  flex: 0 0 auto; width: 44px; height: 44px; border-radius: 50%;
+  background: var(--cyan); border: none; color: #04121a;
+  font-size: 1.15rem; cursor: pointer;
+}
 </style>
 </head>
 <body>
 
-<div class="nav-menu">
-  <button id="nav-toggle" class="nav-toggle" aria-label="Menu" aria-expanded="false">☰</button>
-  <div id="nav-dropdown" class="nav-dropdown">
-    <a href="index.html">🏠 Schedule</a>
-    <a href="health-bot.html">🤖 Health Bot</a>
-    <a href="community.html">📸 Community</a>
-    <a href="suggestion-box.html">💡 Suggestion Box</a>
+  <div class="nav-menu">
+    <button id="nav-toggle" class="nav-toggle" aria-label="Menu" aria-expanded="false">☰</button>
+    <div id="nav-dropdown" class="nav-dropdown">
+      <a href="index.html">🏠 Schedule</a>
+      <a href="health-bot.html">🤖 Health Bot</a>
+      <a href="community.html">📸 Community</a>
+      <a href="suggestion-box.html">💡 Suggestion Box</a>
+    </div>
   </div>
-</div>
-
-
-  <a href="index.html" class="back-link">← Schedule</a>
 
   <header class="page-header">
     <div class="status-tag"><span class="status-dot"></span>HEALTH BOT ONLINE</div>
@@ -174,10 +174,13 @@ body {
   </header>
 
   <div id="chat-log"></div>
-  <div id="chat-options"></div>
+
+  <div id="chat-input-bar">
+    <input type="text" id="chat-input" placeholder="Ask me anything..." autocomplete="off">
+    <button id="chat-send" aria-label="Send">➤</button>
+  </div>
 
 <script>
-
 (function () {
   const toggle = document.getElementById("nav-toggle");
   const dropdown = document.getElementById("nav-dropdown");
@@ -196,178 +199,162 @@ body {
   });
 })();
 
+/* =========================================
+   KNOWLEDGE BASE
+   Each topic has a list of keywords/phrases
+   people might actually type, and an answer.
+   Add a new topic anytime by copying the
+   pattern — more keywords = better matching.
+   ========================================= */
+const TOPICS = [
+  // ----- stretches -----
+  { keywords: ["calf", "calves", "calf tight", "tight calf", "calf stretch"],
+    answer: "Wall calf stretch: face a wall, step one foot back with the knee straight and heel flat on the ground, lean into the wall until you feel it in the upper calf. For the lower calf, do the same but bend the back knee slightly. Hold 30 seconds, twice per leg." },
+  { keywords: ["hamstring", "hamstrings", "back of my leg", "back of thigh", "tight hamstring"],
+    answer: "Prop your heel on a low step or curb with the leg straight, hinge forward from your hips (keep your back flat, don't round it) until you feel it behind the thigh. Hold 30 seconds, twice per leg. Ease into it — hamstrings respond better to a gentle, sustained pull than a hard bounce." },
+  { keywords: ["quad", "quads", "hip flexor", "front of thigh", "front of hip", "hip tight", "tight hip", "hips tight"],
+    answer: "Quads: standing on one leg, grab your other ankle behind you and gently pull your heel toward your glutes, keeping your knees close together. For hip flexors: kneel on one knee in a lunge position, tuck your pelvis slightly, and push your hips forward until you feel a stretch at the front of the hip. 30 seconds each, twice per side." },
+  { keywords: ["it band", "itband", "outer knee", "outer thigh stretch"],
+    answer: "Honest tip: the IT band itself barely stretches, so cross-legged 'IT band stretches' don't do much on their own. What actually helps is loosening the glutes it connects to — try a figure-4 (lying on your back, cross one ankle over the opposite knee, pull that thigh toward your chest) and build glute strength (ask me about glute strength)." },
+
+  // ----- strength -----
+  { keywords: ["core", "abs", "plank", "core strength", "core workout"],
+    answer: "Plank: 30–45 seconds, 3 rounds. Side plank: 20–30 seconds each side, 2–3 rounds. Dead bug: lie on your back, arms up, knees bent at 90°, slowly lower opposite arm and leg toward the floor without your back arching, then switch — 10 each side, 2–3 rounds. A strong core keeps your form from breaking down late in a race." },
+  { keywords: ["glute strength", "glute exercise", "hip strength", "weak hips", "clamshell", "bridge"],
+    answer: "Glute bridge: lie on your back, knees bent, feet flat, squeeze your glutes to lift your hips — 15–20 reps, 2–3 rounds. Clamshells: lie on your side, knees bent, feet together, open your top knee like a clamshell — 15 each side, 2–3 rounds. Weak hips are behind a lot of common runner aches, so this pays off." },
+  { keywords: ["balance", "single leg", "stability", "ankle stability"],
+    answer: "Single-leg balance: stand on one foot 30 seconds each side — close your eyes once that's easy. Single-leg reach: balance on one leg, hinge forward and reach your hand toward the floor, then stand back up — 8–10 each side. Running is just a series of single-leg landings, so this protects your knees and ankles." },
+  { keywords: ["warm up", "warmup", "warm-up", "before practice", "before a workout"],
+    answer: "Skip static stretching cold — it doesn't warm anything up and can even sap a little power. Better: an easy 5-10 minute jog, then dynamic drills like leg swings, high knees, butt kicks, and walking lunges, then 2-4 short strides (quick 20-second accelerations) to wake your legs up before the real work starts." },
+  { keywords: ["cool down", "cooldown", "cool-down", "after a workout", "after practice"],
+    answer: "An easy jog or walk for 5-10 minutes right after a hard effort helps bring your heart rate down gradually instead of stopping cold. That's also the best time for static stretching — your muscles are warm, so it's safer and more effective than stretching before you run." },
+
+  // ----- recovery -----
+  { keywords: ["foam roll", "foam rolling", "ice or heat", "ice bath", "heating pad"],
+    answer: "Foam roll calves, quads, and hamstrings for 30–60 seconds each, rolling slowly and pausing briefly on tender spots — skip rolling directly on joints or bone. Ice is best for fresh soreness or swelling in the first day or two. Heat is better for loosening a muscle that's just tight, or before stretching." },
+  { keywords: ["sleep", "rest day", "how much sleep", "recovery day", "off day"],
+    answer: "This one's underrated: teen athletes genuinely need more sleep than adults — aim for 8–10 hours. Your body adapts and repairs itself during sleep and rest days, not during the workout itself. Skipping rest days doesn't make you tougher, it just raises injury risk — an easy walk or light spin is a fine way to stay active on an off day without adding stress." },
+
+  // ----- nutrition -----
+  { keywords: ["eat before", "before a run", "before a race", "pre race meal", "before racing"],
+    answer: "1–3 hours before running, go for easy-to-digest carbs — a banana, toast with honey, oatmeal. Heavy, greasy, or high-fiber food right before a hard effort can sit poorly and cause stomach trouble mid-run, so save those for other times of day." },
+  { keywords: ["eat after", "after a run", "after a race", "recovery meal", "post run"],
+    answer: "Try to eat within 30–60 minutes of finishing — carbs plus some protein refill your energy stores and kickstart muscle repair. Chocolate milk is a genuinely well-studied classic for this, or a sandwich, or yogurt with fruit." },
+  { keywords: ["what should i eat", "diet", "everyday nutrition", "meal plan", "eating enough", "nutrition"],
+    answer: "Distance runners need real fuel — under-eating hurts performance and recovery more than almost anything else. Build meals around whole grains, fruits, and vegetables for steady energy, protein at each meal for repair, and don't be afraid of carbs — they're your main fuel source, not something to avoid." },
+  { keywords: ["water", "hydration", "hydrate", "how much water", "drink"],
+    answer: "Drink water throughout the whole day, not just right before you run. On hot days or longer runs, add electrolytes too. A simple check: pale yellow is well-hydrated; if it's dark, drink more." },
+
+  // ----- common injuries -----
+  { keywords: ["shin splint", "shin splints", "shin pain", "shin hurt", "shins hurt"],
+    answer: "Shin splints usually come from a jump in mileage or intensity. Back off your volume for a bit, ice the area, and stretch your calves regularly. Check your shoes aren't worn out too. If the pain is sharp and stays in one exact spot rather than a general ache along the bone, stop running and get it checked out — that pattern can mean something more serious than shin splints." },
+  { keywords: ["runner's knee", "runners knee", "knee pain", "knee hurt", "knee hurts", "patellofemoral"],
+    answer: "Knee pain in runners is very often about weak hips and glutes, not the knee itself — ask me about glute strength. In the meantime, ice it, cut back on hills and mileage for a few days, and foam roll your quads and IT band. See a doctor or athletic trainer if it swells, catches, or feels unstable." },
+  { keywords: ["plantar fasciitis", "heel pain", "arch pain", "bottom of my foot", "heel hurts"],
+    answer: "Classic sign is pain in the heel or arch that's worst with your first steps in the morning. Rolling your foot slowly over a frozen water bottle or a lacrosse ball helps, along with calf and foot stretches. Give it real rest if it's sharp, and see a doctor or podiatrist if it doesn't ease up after a week or two of managing it." },
+  { keywords: ["achilles", "back of my ankle", "achilles tendon", "achilles pain"],
+    answer: "Achilles pain or stiffness responds well to calf stretches and slow heel-drop exercises (stand on a step, lower your heel below the edge slowly — that's an eccentric heel drop). Ease off hill work while it heals and ice it after running. A sudden, sharp pain like you got kicked in the back of the ankle needs a doctor right away — that can mean a tear, not just tendinitis." },
+  { keywords: ["blister", "blisters", "foot rubbing", "hot spot on my foot"],
+    answer: "Prevent them with well-fitted shoes and moisture-wicking socks instead of cotton — a small anti-blister balm or tape on spots that always rub helps too. If one forms, keep it clean and covered with a bandage or blister pad rather than popping it. If it's big and painful, ask a parent or your athletic trainer to help drain it safely rather than doing it yourself." },
+  { keywords: ["side stitch", "side cramp", "cramp in my side", "stitch", "side pain while running"],
+    answer: "Side stitches usually come from shallow breathing out of rhythm with your stride, or eating too close to running. In the moment: slow down, take slow deep belly breaths, and try pressing on the spot with your hand. To prevent them, avoid a big meal within about 2 hours of running and ease into your pace instead of starting fast." },
+
+  // ----- race day & mental -----
+  { keywords: ["nervous", "anxiety", "scared", "race anxiety", "meet nerves", "worried about a race"],
+    answer: "Being nervous before a race is completely normal — it usually means you care, not that something's wrong. A few things that genuinely help: a consistent pre-race routine so your body knows what's coming, slow deep breaths to calm your nervous system, and focusing on your own effort and process instead of the outcome or other runners. One rough night of sleep before a big race is common and usually doesn't ruin performance, so don't stress about the stress." },
+  { keywords: ["hot weather", "heat", "overheating", "running in the heat", "hot outside"],
+    answer: "Watch for dizziness, nausea, headache, or suddenly stopping sweating — those are signs of heat illness, and if they happen you should stop, get shade, cool down, and tell an adult right away. To prevent it: hydrate well in the hours before, not just during, wear light and breathable clothing, and be realistic that pace naturally slows on hot, humid days — that's normal, not a sign you're out of shape." },
+
+  // ----- general fallback -----
+  { keywords: ["hurts", "pain", "injury", "injured", "something hurts"],
+    answer: "Normal soreness after a hard effort is dull, shows up on both sides, peaks a day or two later, and eases up once you're warmed up — rest, easy movement, and ice usually sort that out.\n\nSharp pain, pain only on one side, pain that gets worse as you run, swelling, or anything sticking around more than a few days is different — that's a sign to back off, tell your coach, and see an athletic trainer or doctor. Tell me what specifically hurts (like 'my shin' or 'my knee') and I can give more specific pointers, but I'm not a substitute for someone who can actually examine it." }
+];
+
+const STARTER_CHIPS = [
+  "My shins hurt",
+  "What should I eat before a race?",
+  "I'm nervous for my meet",
+  "How do I stretch my hamstrings?"
+];
 
 /* =========================================
-   HEALTH BOT — CONVERSATION DATA
-   Unchanged — add more topics here anytime.
+   MATCHING — scores every topic by how many
+   of its keywords appear in what you typed;
+   longer/more specific phrases score higher.
    ========================================= */
-const CONVO = {
-  start: {
-    bot: "Hey, I'm Health Bot 🤖 — stretches, at-home strength, recovery, and fueling tips for runners. What do you need?",
-    options: [
-      { label: "🦵 Stretches", next: "stretches" },
-      { label: "💪 At-Home Strength", next: "strength" },
-      { label: "🧊 Recovery", next: "recovery" },
-      { label: "🍎 Fueling & Nutrition", next: "nutrition" },
-      { label: "⚠️ Something hurts", next: "hurts" }
-    ]
-  },
+function findBestMatch(userText) {
+  const text = userText.toLowerCase();
+  let best = null;
+  let bestScore = 0;
 
-  stretches: {
-    bot: "Which area's tight?",
-    options: [
-      { label: "Calves", next: "s-calves" },
-      { label: "Hamstrings", next: "s-hamstrings" },
-      { label: "Quads & Hip Flexors", next: "s-quads" },
-      { label: "IT Band & Glutes", next: "s-itband" },
-      { label: "🏠 Main Menu", next: "start" }
-    ]
-  },
-  "s-calves": {
-    bot: "Wall calf stretch: face a wall, step one foot back with the knee straight and heel flat on the ground, lean into the wall until you feel it in the upper calf. For the lower calf, do the same but bend the back knee slightly. Hold 30 seconds, twice per leg.",
-    options: [ { label: "⬅ More Stretches", next: "stretches" }, { label: "🏠 Main Menu", next: "start" } ]
-  },
-  "s-hamstrings": {
-    bot: "Prop your heel on a low step or curb with the leg straight, hinge forward from your hips (keep your back flat, don't round it) until you feel it behind the thigh. Hold 30 seconds, twice per leg. Ease into it — hamstrings respond better to a gentle, sustained pull than a hard bounce.",
-    options: [ { label: "⬅ More Stretches", next: "stretches" }, { label: "🏠 Main Menu", next: "start" } ]
-  },
-  "s-quads": {
-    bot: "Quads: standing on one leg, grab your other ankle behind you and gently pull your heel toward your glutes, keeping your knees close together. For hip flexors: kneel on one knee in a lunge position, tuck your pelvis slightly, and push your hips forward until you feel a stretch at the front of the hip. 30 seconds each, twice per side.",
-    options: [ { label: "⬅ More Stretches", next: "stretches" }, { label: "🏠 Main Menu", next: "start" } ]
-  },
-  "s-itband": {
-    bot: "Honest tip: the IT band itself barely stretches, so cross-legged 'IT band stretches' don't do much on their own. What actually helps is loosening the glutes it connects to — try a figure-4 (lying on your back, cross one ankle over the opposite knee, pull that thigh toward your chest) and add glute strength work.",
-    options: [ { label: "💪 See Glute Strength", next: "st-glutes" }, { label: "🏠 Main Menu", next: "start" } ]
-  },
+  TOPICS.forEach(topic => {
+    let score = 0;
+    topic.keywords.forEach(kw => {
+      if (text.includes(kw)) score += kw.split(" ").length;
+    });
+    if (score > bestScore) {
+      bestScore = score;
+      best = topic;
+    }
+  });
 
-  strength: {
-    bot: "These are all bodyweight — no equipment needed. Pick one:",
-    options: [
-      { label: "Core", next: "st-core" },
-      { label: "Glutes & Hips", next: "st-glutes" },
-      { label: "Single-Leg Stability", next: "st-single" },
-      { label: "🏠 Main Menu", next: "start" }
-    ]
-  },
-  "st-core": {
-    bot: "Plank: 30–45 seconds, 3 rounds. Side plank: 20–30 seconds each side, 2–3 rounds. Dead bug: lie on your back, arms up, knees bent at 90°, slowly lower opposite arm and leg toward the floor without your back arching, then switch — 10 each side, 2–3 rounds. A strong core keeps your form from breaking down late in a race.",
-    options: [ { label: "⬅ More Strength", next: "strength" }, { label: "🏠 Main Menu", next: "start" } ]
-  },
-  "st-glutes": {
-    bot: "Glute bridge: lie on your back, knees bent, feet flat, squeeze your glutes to lift your hips — 15–20 reps, 2–3 rounds. Clamshells: lie on your side, knees bent, feet together, open your top knee like a clamshell — 15 each side, 2–3 rounds. Weak hips are behind a lot of common runner aches, so this pays off.",
-    options: [ { label: "⬅ More Strength", next: "strength" }, { label: "🏠 Main Menu", next: "start" } ]
-  },
-  "st-single": {
-    bot: "Single-leg balance: stand on one foot 30 seconds each side — close your eyes once that's easy. Single-leg reach: balance on one leg, hinge forward and reach your hand toward the floor, then stand back up — 8–10 each side. Running is just a series of single-leg landings, so this protects your knees and ankles.",
-    options: [ { label: "⬅ More Strength", next: "strength" }, { label: "🏠 Main Menu", next: "start" } ]
-  },
-
-  recovery: {
-    bot: "What are you looking for?",
-    options: [
-      { label: "Foam Rolling & Ice/Heat", next: "r-rolling" },
-      { label: "Sleep & Rest Days", next: "r-sleep" },
-      { label: "🏠 Main Menu", next: "start" }
-    ]
-  },
-  "r-rolling": {
-    bot: "Foam roll calves, quads, and hamstrings for 30–60 seconds each, rolling slowly and pausing briefly on tender spots — skip rolling directly on joints or bone. Ice is best for fresh soreness or swelling in the first day or two. Heat is better for loosening a muscle that's just tight, or before stretching.",
-    options: [ { label: "⬅ More Recovery", next: "recovery" }, { label: "🏠 Main Menu", next: "start" } ]
-  },
-  "r-sleep": {
-    bot: "This one's underrated: teen athletes genuinely need more sleep than adults — aim for 8–10 hours. Your body adapts and repairs itself during sleep and rest days, not during the workout itself. Skipping rest days doesn't make you tougher, it just raises injury risk — an easy walk or light spin is a fine way to stay active on an off day without adding stress.",
-    options: [ { label: "⬅ More Recovery", next: "recovery" }, { label: "🏠 Main Menu", next: "start" } ]
-  },
-
-  nutrition: {
-    bot: "Fueling right helps you perform and recover — this isn't about restricting, it's about eating enough of the right things. What do you want to know?",
-    options: [
-      { label: "Before a Run", next: "n-before" },
-      { label: "After a Run", next: "n-after" },
-      { label: "Everyday Eating", next: "n-everyday" },
-      { label: "Hydration", next: "n-hydration" },
-      { label: "🏠 Main Menu", next: "start" }
-    ]
-  },
-  "n-before": {
-    bot: "1–3 hours before running, go for easy-to-digest carbs — a banana, toast with honey, oatmeal. Heavy, greasy, or high-fiber food right before a hard effort can sit poorly and cause stomach trouble mid-run, so save those for other times of day.",
-    options: [ { label: "⬅ More Nutrition", next: "nutrition" }, { label: "🏠 Main Menu", next: "start" } ]
-  },
-  "n-after": {
-    bot: "Try to eat within 30–60 minutes of finishing — carbs plus some protein refill your energy stores and kickstart muscle repair. Chocolate milk is a genuinely well-studied classic for this, or a sandwich, or yogurt with fruit.",
-    options: [ { label: "⬅ More Nutrition", next: "nutrition" }, { label: "🏠 Main Menu", next: "start" } ]
-  },
-  "n-everyday": {
-    bot: "Distance runners need real fuel — under-eating hurts performance and recovery more than almost anything else. Build meals around whole grains, fruits, and vegetables for steady energy, protein at each meal for repair, and don't be afraid of carbs — they're your main fuel source, not something to avoid.",
-    options: [ { label: "⬅ More Nutrition", next: "nutrition" }, { label: "🏠 Main Menu", next: "start" } ]
-  },
-  "n-hydration": {
-    bot: "Drink water throughout the whole day, not just right before you run. On hot days or longer runs, add electrolytes too. A simple check: pale yellow is well-hydrated; if it's dark, drink more.",
-    options: [ { label: "⬅ More Nutrition", next: "nutrition" }, { label: "🏠 Main Menu", next: "start" } ]
-  },
-
-  hurts: {
-    bot: "Normal soreness after a hard effort is dull, shows up on both sides, peaks a day or two later, and eases up once you're warmed up — rest, easy movement, and the recovery tips here usually sort that out.\n\nSharp pain, pain only on one side, pain that gets worse as you run, swelling, or anything sticking around more than a few days is different — that's a sign to back off, tell your coach, and see an athletic trainer or doctor. I can point you to stretches and recovery basics, but I'm not a substitute for someone who can actually examine it.",
-    options: [ { label: "🏠 Main Menu", next: "start" } ]
-  }
-};
+  return best;
+}
 
 /* =========================================
-   CHAT ENGINE — unchanged
+   CHAT ENGINE
    ========================================= */
-let currentNode = "start";
-let history = [];
+const log = document.getElementById("chat-log");
+const input = document.getElementById("chat-input");
 
-function renderLog() {
-  const log = document.getElementById("chat-log");
-  log.innerHTML = "";
-  history.forEach(h => {
-    const b = document.createElement("div");
-    b.className = "bubble " + h.from;
-    b.textContent = h.text;
-    log.appendChild(b);
-  });
-  log.scrollTop = log.scrollHeight;
-}
-
-function renderOptions() {
-  const opts = document.getElementById("chat-options");
-  opts.innerHTML = "";
-  const node = CONVO[currentNode];
-  (node.options || []).forEach(o => {
-    const btn = document.createElement("button");
-    btn.className = "chat-option";
-    btn.textContent = o.label;
-    btn.addEventListener("click", () => selectOption(o.label, o.next));
-    opts.appendChild(btn);
-  });
-}
-
-function showTyping() {
-  const log = document.getElementById("chat-log");
+function addBubble(from, text) {
   const b = document.createElement("div");
-  b.className = "bubble bot typing";
-  b.textContent = "···";
+  b.className = "bubble " + from;
+  b.textContent = text;
   log.appendChild(b);
   log.scrollTop = log.scrollHeight;
+  return b;
 }
 
-function showBotMessage(nodeId) {
-  currentNode = nodeId;
-  history.push({ from: "bot", text: CONVO[nodeId].bot });
-  renderLog();
-  renderOptions();
+function showChips() {
+  const row = document.createElement("div");
+  row.className = "chip-row";
+  STARTER_CHIPS.forEach(text => {
+    const chip = document.createElement("button");
+    chip.className = "chip";
+    chip.textContent = text;
+    chip.addEventListener("click", () => { row.remove(); sendMessage(text); });
+    row.appendChild(chip);
+  });
+  log.appendChild(row);
+  log.scrollTop = log.scrollHeight;
 }
 
-function selectOption(label, nextId) {
-  history.push({ from: "user", text: label });
-  renderLog();
-  document.getElementById("chat-options").innerHTML = "";
-  showTyping();
-  setTimeout(() => showBotMessage(nextId), 600);
+function sendMessage(text) {
+  text = text.trim();
+  if (!text) return;
+  addBubble("user", text);
+  input.value = "";
+
+  const typingBubble = addBubble("bot", "···");
+  typingBubble.classList.add("typing");
+
+  setTimeout(() => {
+    typingBubble.remove();
+    const match = findBestMatch(text);
+    addBubble("bot", match
+      ? match.answer
+      : "I didn't quite catch that — try rewording it, or ask about stretches, strength, recovery, nutrition, a specific ache, or race nerves.");
+  }, 500);
 }
 
-showBotMessage("start");
+document.getElementById("chat-send").addEventListener("click", () => sendMessage(input.value));
+input.addEventListener("keydown", (e) => { if (e.key === "Enter") sendMessage(input.value); });
+
+addBubble("bot", "Hey, I'm Health Bot 🏥 — ask me anything about stretches, strength, recovery, nutrition, common injuries, or race-day nerves. Try one of these, or type your own:");
+showChips();
+
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
 </script>
 </body>
 </html>
