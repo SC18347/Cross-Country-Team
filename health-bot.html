@@ -271,8 +271,11 @@ const TOPICS = [
     answer: "Hip pain in runners is often from the muscles around the joint rather than the joint itself — tight hip flexors, weak glutes, or IT band tightness are common culprits (ask me about those). A dull ache that improves with easy movement usually responds to stretching and glute strength work. Sharp pain deep in the joint, pain that changes how you walk, or pain that doesn't ease with rest is worth getting checked by a doctor or athletic trainer." },
   { keywords: ["joint pain", "joints hurt", "stress fracture", "bone pain"],
     answer: "General joint aches after a hard week of training are common and usually settle with a bit of extra rest and the recovery basics (ask me about recovery). But pain that's sharp, focused on one small spot on a bone, gets worse the more you run, and doesn't ease with rest is different — that pattern can mean a stress fracture, which needs an X-ray or scan to diagnose properly and real time off to heal. Don't try to run through that one; tell your coach and see a doctor." },
-  { keywords: ["pulled a muscle", "muscle strain", "pulled hamstring", "pulled calf", "strain"],
+    { keywords: ["pulled a muscle", "muscle strain", "pulled hamstring", "pulled calf", "pulled quad", "strain"],
     answer: "A real strain or pull (not just tightness) usually comes with a sudden, sharp twinge during the run, not a gradual ache. RICE it right away (Rest, Ice, Compression, Elevation), and give it real rest — running through a strain often turns a one-week injury into a month-long one. Gentle stretching only once the sharp pain has eased, and see a doctor or athletic trainer if it's severe, bruises, or doesn't improve after a few days." },
+  { keywords: ["groin", "groin pain", "groin strain", "groin pull", "inner thigh"],
+    answer: "Groin strains usually come from a sudden movement like a fast start or quick direction change, and feel like a sharp pull on the inside of your thigh near the hip. RICE it right away (Rest, Ice, Compression, Elevation) and avoid stretching it further while it's acute — that can make a strain worse. Give it real time off from running; pushing through a groin strain often turns a short injury into a long one. See a doctor or athletic trainer if it's severe, bruises, or isn't improving after several days of rest." },
+
 
   // ----- race day & mental -----
   { keywords: ["nervous", "anxiety", "scared", "race anxiety", "meet nerves", "worried about a race"],
@@ -291,6 +294,67 @@ const TOPICS = [
     answer: "Normal soreness after a hard effort is dull, shows up on both sides, peaks a day or two later, and eases up once you're warmed up — rest, easy movement, and ice usually sort that out.\n\nSharp pain, pain only on one side, pain that gets worse as you run, swelling, or anything sticking around more than a few days is different — that's a sign to back off, tell your coach, and see an athletic trainer or doctor. Tell me what specifically hurts (like 'my ankle' or 'my hip') and I can give more specific pointers, but I'm not a substitute for someone who can actually examine it." }
 ];
 
+/* =========================================
+   CONVERSATIONAL FALLBACK
+   Catches "my ___ hurts/is tight" style
+   phrasing even when it doesn't match one of
+   the exact keyword phrases above.
+   ========================================= */
+const BODY_PARTS = {
+  knee: "knee", knees: "knee", ankle: "ankle", ankles: "ankle",
+  hip: "hip", hips: "hip", shin: "shin", shins: "shin",
+  calf: "calf", calves: "calf", hamstring: "hamstring", hamstrings: "hamstring",
+  quad: "quad", quads: "quad", quadricep: "quad", quadriceps: "quad",
+  heel: "heel", heels: "heel", foot: "foot", feet: "foot", back: "back",
+  achilles: "achilles", thigh: "thigh", thighs: "thigh", groin: "groin",
+  shoulder: "shoulder", shoulders: "shoulder", elbow: "elbow",
+  wrist: "wrist", neck: "neck", toe: "toe", toes: "toe", arm: "arm", chest: "chest"
+};
+
+const TIGHTNESS_WORDS = ["tight", "tightness", "stiff", "stiffness"];
+const INJURY_WORDS = ["hurt", "hurts", "hurting", "pain", "painful", "sore", "soreness",
+  "ache", "aches", "aching", "sprain", "sprained", "twist", "twisted", "pulled",
+  "strain", "strained", "swollen", "swelling", "cramp", "cramping", "throbbing", "burning", "tender"];
+
+const TIGHTNESS_TOPIC = { calf: "calf stretch", hamstring: "tight hamstring", quad: "hip tight", hip: "hip tight", ankle: "stiff ankle" };
+const INJURY_TOPIC = {
+  knee: "knee pain", ankle: "ankle sprain", hip: "hip pain", shin: "shin splint",
+  achilles: "achilles pain", heel: "heel pain", back: "back pain", groin: "groin pain",
+  foot: "heel pain", calf: "pulled calf", hamstring: "pulled hamstring", quad: "pulled quad"
+};
+
+function tokenize(text) {
+  return text.toLowerCase().match(/[a-z']+/g) || [];
+}
+
+function findTopicByExactKeyword(phrase) {
+  return TOPICS.find(t => t.keywords.includes(phrase));
+}
+
+function findBodyPartMatch(userText) {
+  const words = tokenize(userText);
+  const foundPart = words.map(w => BODY_PARTS[w]).find(Boolean);
+  if (!foundPart) return null;
+
+  const isInjury = words.some(w => INJURY_WORDS.includes(w));
+  const isTight = words.some(w => TIGHTNESS_WORDS.includes(w));
+  if (!isInjury && !isTight) return null;
+
+  const searchPhrase = isInjury
+    ? (INJURY_TOPIC[foundPart] || TIGHTNESS_TOPIC[foundPart])
+    : (TIGHTNESS_TOPIC[foundPart] || INJURY_TOPIC[foundPart]);
+
+  if (searchPhrase) {
+    const topic = findTopicByExactKeyword(searchPhrase);
+    if (topic) return topic;
+  }
+
+  return {
+    answer: `I don't have specific ${foundPart} content built in yet, but the general rule still applies: dull, two-sided soreness that fades in a day or two is normal — rest, ice, and easy movement. Sharp pain, one-sided pain, swelling, or anything that doesn't ease up after a few days needs your coach and a doctor or athletic trainer, not just me. I do know these well: shin, calf, hamstring, quad, knee, ankle, hip, heel, groin, back, or Achilles.`
+  };
+}
+
+
 const STARTER_CHIPS = [
   "My shins hurt",
   "What should I eat before a race?",
@@ -304,7 +368,8 @@ const STARTER_CHIPS = [
    of its keywords appear in what you typed;
    longer/more specific phrases score higher.
    ========================================= */
-function findBestMatch(userText) {
+
+function findPhraseMatch(userText) {
   const text = userText.toLowerCase();
   let best = null;
   let bestScore = 0;
@@ -320,8 +385,19 @@ function findBestMatch(userText) {
     }
   });
 
-  return best;
+  return { topic: best, score: bestScore };
 }
+
+function findBestMatch(userText) {
+  const phraseMatch = findPhraseMatch(userText);
+  if (phraseMatch.score >= 2) return phraseMatch.topic;
+
+  const bodyMatch = findBodyPartMatch(userText);
+  if (bodyMatch) return bodyMatch;
+
+  return phraseMatch.topic;
+}
+
 
 /* =========================================
    CHAT ENGINE
