@@ -206,6 +206,7 @@ body {
    Add a new topic anytime by copying the
    pattern — more keywords = better matching.
    ========================================= */
+
 const TOPICS = [
   // ----- stretches -----
   { keywords: ["calf", "calves", "calf tight", "tight calf", "calf stretch"],
@@ -215,7 +216,13 @@ const TOPICS = [
   { keywords: ["quad", "quads", "hip flexor", "front of thigh", "front of hip", "hip tight", "tight hip", "hips tight"],
     answer: "Quads: standing on one leg, grab your other ankle behind you and gently pull your heel toward your glutes, keeping your knees close together. For hip flexors: kneel on one knee in a lunge position, tuck your pelvis slightly, and push your hips forward until you feel a stretch at the front of the hip. 30 seconds each, twice per side." },
   { keywords: ["it band", "itband", "outer knee", "outer thigh stretch"],
-    answer: "Honest tip: the IT band itself barely stretches, so cross-legged 'IT band stretches' don't do much on their own. What actually helps is loosening the glutes it connects to — try a figure-4 (lying on your back, cross one ankle over the opposite knee, pull that thigh toward your chest) and build glute strength (ask me about glute strength)." },
+    answer: "Honest tip: the IT band itself barely stretches, so cross-legged 'IT band stretches' don't do much on their own. What actually helps is loosening the glutes it connects to — try a figure-4 (lying on your back, cross one ankle over the opposite knee, pull that thigh toward your chest) and build glute strength work (ask me about glute strength)." },
+  { keywords: ["ankle stretch", "ankle mobility", "stiff ankle", "ankle flexibility"],
+    answer: "Ankle circles: lift your foot off the ground and slowly circle it 10 times each direction, both feet. Alphabet trace: write the letters of the alphabet in the air with your big toe — sounds silly, works great for mobility. A calf stretch also helps ankle flexibility since they're connected (ask me about calf stretches)." },
+  { keywords: ["hip stretch", "piriformis", "hip rotator", "tight glutes"],
+    answer: "Figure-4 stretch: lying on your back, cross one ankle over the opposite knee, then pull that thigh toward your chest until you feel it in the glute/hip area. Hold 30 seconds each side. This targets the piriformis and hip rotators, which get tight from running and can contribute to IT band and lower back issues if ignored." },
+  { keywords: ["back pain", "lower back", "back stretch", "back hurts", "back tight"],
+    answer: "Child's pose: kneel and sit back on your heels, reach your arms forward and lower your chest toward the ground, hold 30-45 seconds. Knee-to-chest: lying on your back, pull one knee toward your chest, hold 20 seconds, switch sides. A lot of runner back tightness actually comes from a weak core and tight hip flexors, so core work (ask me about core) helps prevent it long-term, not just stretching after it's already tight." },
 
   // ----- strength -----
   { keywords: ["core", "abs", "plank", "core strength", "core workout"],
@@ -258,24 +265,39 @@ const TOPICS = [
     answer: "Prevent them with well-fitted shoes and moisture-wicking socks instead of cotton — a small anti-blister balm or tape on spots that always rub helps too. If one forms, keep it clean and covered with a bandage or blister pad rather than popping it. If it's big and painful, ask a parent or your athletic trainer to help drain it safely rather than doing it yourself." },
   { keywords: ["side stitch", "side cramp", "cramp in my side", "stitch", "side pain while running"],
     answer: "Side stitches usually come from shallow breathing out of rhythm with your stride, or eating too close to running. In the moment: slow down, take slow deep belly breaths, and try pressing on the spot with your hand. To prevent them, avoid a big meal within about 2 hours of running and ease into your pace instead of starting fast." },
+  { keywords: ["ankle", "rolled my ankle", "twisted my ankle", "ankle sprain", "sprained ankle"],
+    answer: "A rolled or sprained ankle needs RICE right away: Rest, Ice (20 minutes on, 20 off), Compression (a wrap, snug but not tight), Elevation (prop it above your heart). If you can't put weight on it at all, or it's badly swollen or bruised, get it checked by a doctor — that can mean a more serious sprain or even a fracture. For a mild one, once swelling's down, gentle ankle circles and alphabet-tracing with your foot rebuild mobility before easing back into running." },
+  { keywords: ["hip pain", "hip hurts", "hip joint", "bursitis", "outer hip"],
+    answer: "Hip pain in runners is often from the muscles around the joint rather than the joint itself — tight hip flexors, weak glutes, or IT band tightness are common culprits (ask me about those). A dull ache that improves with easy movement usually responds to stretching and glute strength work. Sharp pain deep in the joint, pain that changes how you walk, or pain that doesn't ease with rest is worth getting checked by a doctor or athletic trainer." },
+  { keywords: ["joint pain", "joints hurt", "stress fracture", "bone pain"],
+    answer: "General joint aches after a hard week of training are common and usually settle with a bit of extra rest and the recovery basics (ask me about recovery). But pain that's sharp, focused on one small spot on a bone, gets worse the more you run, and doesn't ease with rest is different — that pattern can mean a stress fracture, which needs an X-ray or scan to diagnose properly and real time off to heal. Don't try to run through that one; tell your coach and see a doctor." },
+  { keywords: ["pulled a muscle", "muscle strain", "pulled hamstring", "pulled calf", "strain"],
+    answer: "A real strain or pull (not just tightness) usually comes with a sudden, sharp twinge during the run, not a gradual ache. RICE it right away (Rest, Ice, Compression, Elevation), and give it real rest — running through a strain often turns a one-week injury into a month-long one. Gentle stretching only once the sharp pain has eased, and see a doctor or athletic trainer if it's severe, bruises, or doesn't improve after a few days." },
 
   // ----- race day & mental -----
   { keywords: ["nervous", "anxiety", "scared", "race anxiety", "meet nerves", "worried about a race"],
-    answer: "Being nervous before a race is completely normal — it usually means you care, not that something's wrong. A few things that genuinely help: a consistent pre-race routine so your body knows what's coming, slow deep breaths to calm your nervous system, and focusing on your own effort and process instead of the outcome or other runners. One rough night of sleep before a big race is common and usually doesn't ruin performance, so don't stress about the stress." },
+    answer: "Being nervous before a race is completely normal — it usually means you care, not that something's wrong. A few things that genuinely help: a consistent pre-race routine so your body knows what's coming, slow deep breaths to calm your nervous system (ask me about breathing exercises), and focusing on your own effort and process instead of the outcome or other runners. One rough night of sleep before a big race is common and usually doesn't ruin performance, so don't stress about the stress." },
   { keywords: ["hot weather", "heat", "overheating", "running in the heat", "hot outside"],
     answer: "Watch for dizziness, nausea, headache, or suddenly stopping sweating — those are signs of heat illness, and if they happen you should stop, get shade, cool down, and tell an adult right away. To prevent it: hydrate well in the hours before, not just during, wear light and breathable clothing, and be realistic that pace naturally slows on hot, humid days — that's normal, not a sign you're out of shape." },
 
+  // ----- breathing -----
+  { keywords: ["breathing exercise", "how to breathe", "calm down breathing", "deep breathing", "belly breathing", "breathing exercises"],
+    answer: "Box breathing works well before a race or when you're stressed: breathe in for 4 seconds, hold for 4, breathe out for 4, hold for 4, repeat. For belly breathing: put a hand on your stomach, breathe in through your nose so your stomach rises (not your chest), breathe out slowly through your mouth. Both slow your heart rate and calm your nervous system — genuinely useful the night before a big meet, not just a gimmick." },
+  { keywords: ["breathing while running", "breathing pattern", "how to breathe when running", "running breathing technique"],
+    answer: "A common pattern is 3:2 — inhale for 3 footstrikes, exhale for 2 — for easy-to-moderate paces, switching to 2:1 for harder efforts like races. The idea is alternating which foot lands when you exhale (your body's most vulnerable moment), which some research ties to lower injury risk. It takes practice to feel natural, so try it on easy runs first, not on race day." },
+
   // ----- general fallback -----
   { keywords: ["hurts", "pain", "injury", "injured", "something hurts"],
-    answer: "Normal soreness after a hard effort is dull, shows up on both sides, peaks a day or two later, and eases up once you're warmed up — rest, easy movement, and ice usually sort that out.\n\nSharp pain, pain only on one side, pain that gets worse as you run, swelling, or anything sticking around more than a few days is different — that's a sign to back off, tell your coach, and see an athletic trainer or doctor. Tell me what specifically hurts (like 'my shin' or 'my knee') and I can give more specific pointers, but I'm not a substitute for someone who can actually examine it." }
+    answer: "Normal soreness after a hard effort is dull, shows up on both sides, peaks a day or two later, and eases up once you're warmed up — rest, easy movement, and ice usually sort that out.\n\nSharp pain, pain only on one side, pain that gets worse as you run, swelling, or anything sticking around more than a few days is different — that's a sign to back off, tell your coach, and see an athletic trainer or doctor. Tell me what specifically hurts (like 'my ankle' or 'my hip') and I can give more specific pointers, but I'm not a substitute for someone who can actually examine it." }
 ];
 
 const STARTER_CHIPS = [
   "My shins hurt",
   "What should I eat before a race?",
   "I'm nervous for my meet",
-  "How do I stretch my hamstrings?"
+  "How should I breathe when running?"
 ];
+
 
 /* =========================================
    MATCHING — scores every topic by how many
